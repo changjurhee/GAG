@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ddong Drop</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="game-container">
+        <canvas id="gameCanvas" width="400" height="600"></canvas>
+        <div id="ui-layer">
+            <div id="score-board">Score: <span id="score">0</span></div>
+            <div id="timer-board">Time: <span id="time">15</span></div>
+            <div id="level-board">Level: <span id="level">1</span></div>
+            <div id="start-screen" class="screen active">
+                <h1>💩 Ddong Drop 💩</h1>
+                <p>Avoid the falling poop!</p>
+                <p>Use Left/Right Arrows to move.</p>
+                <div id="character-selection">
+                    <p>Select Character:</p>
+                    <div class="char-options">
+                        <button class="char-btn selected" data-char="😃">😃</button>
+                        <button class="char-btn" data-char="🐱">🐱</button>
+                        <button class="char-btn" data-char="🐼">🐼</button>
+                        <button class="char-btn" data-char="🤖">🤖</button>
+                    </div>
+                </div>
+                <div id="bgm-selection">
+                    <p>Select Music:</p>
+                    <div class="bgm-options">
+                        <button class="bgm-btn selected" data-bgm="exciting">Exciting</button>
+                        <button class="bgm-btn" data-bgm="sad">Sad</button>
+                        <button class="bgm-btn" data-bgm="epic">Epic</button>
+                    </div>
+                </div>
+                <button id="start-btn">Start Game</button>
+            </div>
+            <div id="game-over-screen" class="screen hidden">
+                <h1>Game Over</h1>
+                <p>Final Score: <span id="final-score">0</span></p>
+                <button id="restart-btn">Try Again</button>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="js/main.js"></script>
+</body>
+
+</html>

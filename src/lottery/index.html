@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lotto 6/45 Generator</title>
+    <link rel="stylesheet" href="style.css?v=6">
+</head>
+
+<body>
+    <div class="dashboard">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <button id="sidebar-close" class="sidebar-btn" style="margin-left: auto;">«</button>
+            </div>
+            <div class="controls">
+                <div class="options">
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="algorithm" value="random" checked>
+                            <span class="radio-label">Pure Random 🎲</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="algorithm" value="weighted">
+                            <span class="radio-label">Frequency (Weighted) 📊</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="algorithm" value="adaptive">
+                            <span class="radio-label">Trend (Adaptive) 📈</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="algorithm" value="non-frequency">
+                            <span class="radio-label">Non-Frequency (Cold) ❄️</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="options">
+                    <h3>RNG Source 🎲</h3>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="rng" value="prng" checked>
+                            <span class="radio-label">Basic PRNG (Fast)</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="rng" value="secure">
+                            <span class="radio-label">Secure (Web Crypto) 🔒</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="rng" value="vrf">
+                            <span class="radio-label">VRF (Simulated) 🔑</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="rng" value="blockchain">
+                            <span class="radio-label">Blockchain (Bitcoin) ₿</span>
+                        </label>
+                    </div>
+                </div>
+                <button id="start-btn">Generate Numbers</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="top-bar">
+                <div class="header-left">
+                    <button id="sidebar-open" class="sidebar-btn hidden">»</button>
+                    <h1>🎰 Lotto 6/45</h1>
+                </div>
+                <button id="reset-btn" class="hidden">Reset</button>
+            </div>
+
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="main-view">Main View 📊</button>
+                <button class="tab-btn" data-tab="history-view">History View 📜</button>
+                <button class="tab-btn" data-tab="simulation-view">Simulation ⚙️</button>
+            </div>
+
+            <div id="main-view" class="tab-content active">
+                <div class="chart-container">
+                    <canvas id="frequencyChart"></canvas>
+                </div>
+                <div id="ball-container" class="ball-container">
+                    <!-- Balls will be added here -->
+                </div>
+            </div>
+
+            <div id="history-view" class="tab-content">
+                <div class="history-section">
+                    <h3>Generation History 📜</h3>
+                    <div id="history-log">
+                        <!-- History items will be added here -->
+                        <div class="history-placeholder">No history yet. Generate some numbers!</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="simulation-view" class="tab-content">
+                <div class="sim-container">
+                    <canvas id="simCanvas"></canvas>
+                    <div class="sim-controls">
+                        <div class="control-group">
+                            <label for="turbulence-slider">Turbulence 🌪️</label>
+                            <input type="range" id="turbulence-slider" min="0" max="20" value="5" step="1">
+                        </div>
+                        <div class="control-group">
+                            <label for="interval-input">Interval (sec) ⏱️</label>
+                            <input type="number" id="interval-input" min="0.5" max="10" value="2.0" step="0.5"
+                                style="width: 60px; text-align: center;">
+                        </div>
+                        <div class="control-group">
+                            <label for="gravity-slider">Gravity (Weight) ⚖️</label>
+                            <input type="range" id="gravity-slider" min="1" max="20" value="5" step="1">
+                        </div>
+                        <div class="control-group">
+                            <label for="size-slider">Ball Size 📏</label>
+                            <input type="range" id="size-slider" min="5" max="20" value="10" step="1">
+                        </div>
+                        <button id="sim-start-btn">Start Simulation 🌪️</button>
+                    </div>
+                    <div id="sim-results" class="ball-container"></div>
+                </div>
+            </div>
+
+            <footer class="footer">
+                <p>&copy; 2025 Lotto Generator. All rights reserved.</p>
+            </footer>
+        </main>
+    </div>
+    <script src="chart.js"></script>
+    <script src="winning_numbers.js?v=2"></script>
+    <script src="script.js?v=24"></script>
+</body>
+
+</html>
