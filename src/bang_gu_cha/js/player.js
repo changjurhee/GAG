@@ -100,12 +100,36 @@ class Player {
 
         // Draw Face
         if (this.faceImage && this.faceImage.complete) {
-            // Face should be upright or rotate with car? 
-            // Let's rotate with car for now, but maybe keep it upright if it looks weird.
-            // Actually, for a top-down car, the face usually looks "forward" relative to the car.
-            // So drawing it rotated with the car is correct.
-            const faceSize = this.size * 0.6;
-            ctx.drawImage(this.faceImage, -faceSize / 2, -faceSize / 2, faceSize, faceSize);
+            // Bobbing animation
+            const bobOffset = Math.sin(Date.now() / 150) * 3;
+
+            // Scale up for "Big Head" effect
+            const faceSize = this.size * 0.9;
+
+            ctx.save();
+
+            // Apply glow/shadow effect for "sticker" look
+            ctx.shadowColor = 'white';
+            ctx.shadowBlur = 10;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+
+            // Draw face centered but slightly higher due to bobbing
+            // Note: We are already translated to center of car and rotated.
+            // To make the face always upright relative to screen, we should counter-rotate?
+            // Or just let it rotate with car? User said "character rendering", usually top-down faces rotate with body.
+            // Let's keep rotation but add the bobbing.
+
+            // Draw a white background circle behind face to help with contrast (optional, but shadowBlur helps)
+            // ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+            // ctx.beginPath();
+            // ctx.arc(0, 0, faceSize/2 + 2, 0, Math.PI*2);
+            // ctx.fill();
+
+            ctx.drawImage(this.faceImage, -faceSize / 2, -faceSize / 2 + bobOffset, faceSize, faceSize);
+
+            // Add a second layer of shadow for intensity if needed, or just restore
+            ctx.restore();
         }
 
         ctx.restore();

@@ -80,6 +80,10 @@
   - **Progress Feedback**: A progress bar should be displayed while the AI model is loading or processing.
   - **Privacy**: All image processing must happen locally in the user's browser. No images should be sent to external servers.
   - The captured photo can be used as the character face.
+- **Visual Enhancements**:
+  - **Pop Effect**: Character face should be larger and have a "sticker" look (white outline/glow).
+  - **Animation**: Face should bob up and down to feel alive.
+  - **Shadow**: Drop shadow for depth.
 
 ## 7. Future Improvements (To Be Implemented)
 - [ ] Improved Map Generation (Maze algorithms).
