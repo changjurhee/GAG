@@ -43,6 +43,8 @@ class Game {
                 return;
             }
 
+            if (!this.player) return;
+
             switch (e.code) {
                 case 'ArrowUp': this.player.setDirection(0, -1); break;
                 case 'ArrowDown': this.player.setDirection(0, 1); break;

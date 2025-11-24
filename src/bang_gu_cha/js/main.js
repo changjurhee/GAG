@@ -8,7 +8,6 @@ window.addEventListener('load', () => {
             const selectedFace = option.getAttribute('data-face');
             selectionScreen.classList.add('hidden');
             game.setFace(selectedFace);
-            game.start();
         });
     });
 });
