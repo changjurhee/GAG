@@ -1,4 +1,4 @@
-> Antigravity로 어디까지 가능할지 테스트 해보는 중이다.
+> Antigravity로 어디까지 가능할지 테스트 해보는 중이다. 미쳤구나 ! 
  
 - Antigravity Version: 1.11.5
 - VSCode OSS Version: 1.104.0
