@@ -1,5 +1,5 @@
 class Player {
-    constructor(map, x, y) {
+    constructor(map, x, y, facePath) {
         this.map = map;
         this.x = x;
         this.y = y;
@@ -14,6 +14,11 @@ class Player {
 
         this.image = new Image();
         this.image.src = 'assets/player.png';
+
+        this.faceImage = new Image();
+        if (facePath) {
+            this.faceImage.src = facePath;
+        }
     }
 
     update() {
@@ -91,6 +96,16 @@ class Player {
             // Fallback
             ctx.fillStyle = '#3498db';
             ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size);
+        }
+
+        // Draw Face
+        if (this.faceImage && this.faceImage.complete) {
+            // Face should be upright or rotate with car? 
+            // Let's rotate with car for now, but maybe keep it upright if it looks weird.
+            // Actually, for a top-down car, the face usually looks "forward" relative to the car.
+            // So drawing it rotated with the car is correct.
+            const faceSize = this.size * 0.6;
+            ctx.drawImage(this.faceImage, -faceSize / 2, -faceSize / 2, faceSize, faceSize);
         }
 
         ctx.restore();

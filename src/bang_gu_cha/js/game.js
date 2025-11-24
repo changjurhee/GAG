@@ -5,10 +5,11 @@ class Game {
         this.width = this.canvas.width;
         this.height = this.canvas.height;
         this.tileSize = 40;
+        this.faceAsset = null;
 
         this.map = new GameMap(this.width, this.height, this.tileSize);
-        // Player at (1, 1). Size is tileSize-4, so offset is 2.
-        this.player = new Player(this.map, this.tileSize * 1 + 2, this.tileSize * 1 + 2);
+        // Player will be initialized in reset() or start() after face selection
+        this.player = null;
 
         // Enemies at corners
         const endCol = this.map.cols - 2;
@@ -28,6 +29,11 @@ class Game {
         this.uiMessage = document.getElementById('game-message');
 
         this.bindInput();
+    }
+
+    setFace(facePath) {
+        this.faceAsset = facePath;
+        this.reset();
     }
 
     bindInput() {
@@ -54,7 +60,7 @@ class Game {
 
     reset() {
         this.map = new GameMap(this.width, this.height, this.tileSize);
-        this.player = new Player(this.map, this.tileSize * 1 + 2, this.tileSize * 1 + 2);
+        this.player = new Player(this.map, this.tileSize * 1 + 2, this.tileSize * 1 + 2, this.faceAsset);
 
         const endCol = this.map.cols - 2;
         const endRow = this.map.rows - 2;

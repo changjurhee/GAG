@@ -68,7 +68,14 @@
   - `assets/enemy.png`: Enemy car sprite.
   - Fallback colored rectangles if images fail to load.
 
-## 6. Future Improvements (To Be Implemented)
+## 6. New Features (In Progress)
+### 6.1 Character Customization
+- **Player Face Display**: The player's car should display a character face.
+- **Character Selection**:
+  - Before the game starts, the user can select a face from multiple options.
+  - The selected face is applied to the player's car during gameplay.
+
+## 7. Future Improvements (To Be Implemented)
 - [ ] Improved Map Generation (Maze algorithms).
 - [ ] Sound Effects (BGM, Fart sound, Crash sound).
 - [ ] High Score System.
