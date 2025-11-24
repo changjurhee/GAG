@@ -32,8 +32,30 @@
                     <img src="assets/face_4.png" alt="Face 4">
                 </div>
             </div>
+            <button id="camera-btn">📷 Use Camera</button>
+
+            <div id="camera-container" class="hidden">
+                <video id="camera-source" class="hidden" playsinline></video>
+                <canvas id="camera-preview"></canvas>
+                <div id="loading-overlay" class="hidden">
+                    <div class="spinner"></div>
+                    <p>Loading AI Model...</p>
+                </div>
+                <button id="capture-btn">Capture</button>
+                <button id="cancel-camera-btn">Cancel</button>
+            </div>
+            <canvas id="camera-canvas" class="hidden"></canvas>
         </div>
     </div>
+
+    <!-- MediaPipe Dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js"
+        crossorigin="anonymous"></script>
 
     <script src="js/utils.js"></script>
     <script src="js/map.js"></script>

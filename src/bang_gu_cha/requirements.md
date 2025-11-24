@@ -74,6 +74,12 @@
 - **Character Selection**:
   - Before the game starts, the user can select a face from multiple options.
   - The selected face is applied to the player's car during gameplay.
+- **Photo Capture**:
+  - Users can use their webcam to take a photo of themselves.
+  - **Background Removal**: The system should automatically remove the background, keeping only the user's face/body.
+  - **Progress Feedback**: A progress bar should be displayed while the AI model is loading or processing.
+  - **Privacy**: All image processing must happen locally in the user's browser. No images should be sent to external servers.
+  - The captured photo can be used as the character face.
 
 ## 7. Future Improvements (To Be Implemented)
 - [ ] Improved Map Generation (Maze algorithms).
