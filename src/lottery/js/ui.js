@@ -182,7 +182,12 @@ function addToHistory(numbers, algoName, rngName) {
     const dateStr = now.toLocaleString();
 
     // Separate Main and Bonus
-    const mainNumbers = numbers.slice(0, CONFIG.MAIN_NUMBERS_COUNT).sort((a, b) => a - b);
+    let mainNumbers = numbers.slice(0, CONFIG.MAIN_NUMBERS_COUNT);
+
+    // Only sort if NOT sequential
+    if (!algoName.includes('Sequential')) {
+        mainNumbers.sort((a, b) => a - b);
+    }
     const bonusNumber = numbers[CONFIG.MAIN_NUMBERS_COUNT];
 
     const ballsHtml = generateBallsHTML(mainNumbers, bonusNumber);
