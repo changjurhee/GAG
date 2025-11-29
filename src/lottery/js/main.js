@@ -66,11 +66,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const rngFunc = await getRNG(selectedRngType);
 
             if (selectedAlgo === 'weighted') {
-                numbers = await getWeightedNumbers(rngFunc, recentWinningNumbers);
+                numbers = await getWeightedNumbers(rngFunc);
             } else if (selectedAlgo === 'adaptive') {
-                numbers = await getAdaptiveNumbers(rngFunc, recentWinningNumbers);
+                numbers = await getAdaptiveNumbers(rngFunc);
             } else if (selectedAlgo === 'non-frequency') {
-                numbers = await getNonFrequencyNumbers(rngFunc, recentWinningNumbers);
+                numbers = await getNonFrequencyNumbers(rngFunc);
+            } else if (selectedAlgo === 'sequential') {
+                numbers = await getSequentialNumbers(rngFunc);
             } else {
                 numbers = await getRandomNumbers(rngFunc);
             }

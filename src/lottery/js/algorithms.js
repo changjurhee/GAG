@@ -123,8 +123,122 @@ async function getNonFrequencyNumbers(rng, winningNumbers = []) {
     return createPoolAndPick(weights, CONFIG.WEIGHTED_POWER, rng);
 }
 
+/**
+ * Generate numbers using Sequential Analysis (Markov Chain)
+ * Analyzes the probability of Number B following Number A in sorted draws.
+ * @param {Function} rng - Random number generator function
+ * @returns {Promise<number[]>} Array of selected numbers
+ */
+async function getSequentialNumbers(rng) {
+    const transitions = {}; // { 1: { 2: 5, 3: 2 }, ... }
+    const firstNumbers = {}; // { 1: 10, 2: 5, ... }
+
+    // 1. Build Transition Matrix from History
+    const history = typeof allWinningNumbers !== 'undefined' ? allWinningNumbers : [];
+
+    history.forEach(draw => {
+        if (!Array.isArray(draw) || draw.length < 6) return;
+
+        // Sort to ensure sequence
+        const sortedDraw = [...draw].sort((a, b) => a - b);
+
+        // Record first number
+        const first = sortedDraw[0];
+        firstNumbers[first] = (firstNumbers[first] || 0) + 1;
+
+        // Record transitions
+        for (let i = 0; i < sortedDraw.length - 1; i++) {
+            const current = sortedDraw[i];
+            const next = sortedDraw[i + 1];
+
+            if (!transitions[current]) transitions[current] = {};
+            transitions[current][next] = (transitions[current][next] || 0) + 1;
+        }
+    });
+
+    const result = [];
+
+    // 2. Pick First Number
+    const firstNum = await pickFromWeights(firstNumbers, rng);
+    result.push(firstNum);
+
+    // 3. Pick Subsequent Numbers
+    let currentNum = firstNum;
+
+    while (result.length < 6) {
+        let nextNum;
+
+        // Check if we have transition data for current number
+        if (transitions[currentNum]) {
+            // Filter out numbers already picked to avoid duplicates
+            const candidates = { ...transitions[currentNum] };
+            result.forEach(picked => delete candidates[picked]);
+
+            if (Object.keys(candidates).length > 0) {
+                // Pick based on transition probability
+                nextNum = await pickFromWeights(candidates, rng);
+            }
+        }
+
+        // Fallback: If no transition data or all candidates picked
+        if (!nextNum) {
+            // Pick a random number greater than current (to maintain sorted order preference if possible)
+            // But standard lottery doesn't strictly require sorted generation, just unique.
+            // Let's pick any available number, preferably higher to mimic typical sequence.
+            const available = [];
+            for (let i = 1; i <= 45; i++) {
+                if (!result.includes(i)) available.push(i);
+            }
+
+            // Try to pick higher numbers first to look natural
+            const higher = available.filter(n => n > currentNum);
+            if (higher.length > 0) {
+                const r = await rng();
+                nextNum = higher[Math.floor(r * higher.length)];
+            } else {
+                const r = await rng();
+                nextNum = available[Math.floor(r * available.length)];
+            }
+        }
+
+        result.push(nextNum);
+        currentNum = nextNum;
+    }
+
+    // 4. Pick Bonus Number (Randomly from remaining)
+    const availableForBonus = [];
+    for (let i = 1; i <= 45; i++) {
+        if (!result.includes(i)) availableForBonus.push(i);
+    }
+    const r = await rng();
+    const bonus = availableForBonus[Math.floor(r * availableForBonus.length)];
+    result.push(bonus);
+
+    return result;
+}
+
+/**
+ * Helper to pick a key from a weight object
+ */
+async function pickFromWeights(weights, rng) {
+    let totalWeight = 0;
+    for (const w of Object.values(weights)) totalWeight += w;
+
+    const r = await rng();
+    let randomWeight = r * totalWeight;
+
+    for (const [num, weight] of Object.entries(weights)) {
+        randomWeight -= weight;
+        if (randomWeight <= 0) return parseInt(num);
+    }
+
+    // Fallback (should rarely happen due to float precision)
+    return parseInt(Object.keys(weights)[0]);
+}
+
 // Make algorithm functions available globally
 window.createPoolAndPick = createPoolAndPick;
 window.getWeightedNumbers = getWeightedNumbers;
 window.getAdaptiveNumbers = getAdaptiveNumbers;
 window.getNonFrequencyNumbers = getNonFrequencyNumbers;
+window.getSequentialNumbers = getSequentialNumbers;

@@ -14,14 +14,23 @@ function renderChart(winningNumbers = [], bonusNumbers = []) {
     // Calculate frequency
     const frequency = Array(CONFIG.TOTAL_NUMBERS + 1).fill(0); // Index 0 unused
     const bonusFrequency = Array(CONFIG.TOTAL_NUMBERS + 1).fill(0);
+    const firstNumFrequency = Array(CONFIG.TOTAL_NUMBERS + 1).fill(0);
 
     winningNumbers.forEach(draw => {
-        if (Array.isArray(draw)) {
+        if (Array.isArray(draw) && draw.length > 0) {
+            // Main Frequency
             draw.forEach(num => {
                 if (num >= 1 && num <= CONFIG.TOTAL_NUMBERS) {
                     frequency[num]++;
                 }
             });
+
+            // First Number Frequency (Start Number)
+            const sortedDraw = [...draw].sort((a, b) => a - b);
+            const firstNum = sortedDraw[0];
+            if (firstNum >= 1 && firstNum <= CONFIG.TOTAL_NUMBERS) {
+                firstNumFrequency[firstNum]++;
+            }
         }
     });
 
@@ -35,6 +44,7 @@ function renderChart(winningNumbers = [], bonusNumbers = []) {
     const labels = [];
     const data = [];
     const bonusData = [];
+    const firstNumData = [];
     const backgroundColors = [];
     const borderColors = [];
 
@@ -42,6 +52,7 @@ function renderChart(winningNumbers = [], bonusNumbers = []) {
         labels.push(i);
         data.push(frequency[i]);
         bonusData.push(bonusFrequency[i]);
+        firstNumData.push(firstNumFrequency[i]);
 
         // Color based on range
         const range = CONFIG.RANGES.find(r => i <= r.max);
@@ -70,7 +81,7 @@ function renderChart(winningNumbers = [], bonusNumbers = []) {
                     backgroundColor: backgroundColors,
                     borderColor: borderColors,
                     borderWidth: 1,
-                    order: 2,
+                    order: 3,
                     yAxisID: 'y'
                 },
                 {
@@ -83,6 +94,19 @@ function renderChart(winningNumbers = [], bonusNumbers = []) {
                     pointBackgroundColor: 'rgba(45, 52, 54, 1)',
                     pointRadius: 3,
                     tension: 0.4, // Smooth curve
+                    order: 2,
+                    yAxisID: 'y1'
+                },
+                {
+                    type: 'line',
+                    label: 'Start Number Frequency',
+                    data: firstNumData,
+                    backgroundColor: 'rgba(155, 89, 182, 0.2)', // Purple
+                    borderColor: 'rgba(155, 89, 182, 1)',
+                    borderWidth: 2,
+                    pointBackgroundColor: 'rgba(155, 89, 182, 1)',
+                    pointRadius: 3,
+                    tension: 0.4,
                     order: 1,
                     yAxisID: 'y1'
                 }
@@ -112,7 +136,7 @@ function renderChart(winningNumbers = [], bonusNumbers = []) {
                     },
                     title: {
                         display: true,
-                        text: 'Bonus Frequency'
+                        text: 'Bonus / Start Frequency'
                     }
                 },
                 x: {
@@ -129,7 +153,7 @@ function renderChart(winningNumbers = [], bonusNumbers = []) {
                 },
                 title: {
                     display: true,
-                    text: 'Winning Number Frequency (Main vs Bonus)'
+                    text: 'Winning Number Frequency (Main vs Bonus vs Start)'
                 },
                 tooltip: {
                     mode: 'index',
