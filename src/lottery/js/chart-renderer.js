@@ -26,8 +26,9 @@ function renderChart(winningNumbers = [], bonusNumbers = []) {
             });
 
             // First Number Frequency (Start Number)
-            const sortedDraw = [...draw].sort((a, b) => a - b);
-            const firstNum = sortedDraw[0];
+            // Use the first number as is, assuming data preserves extraction order if available
+            // If data is already sorted (like current winning_numbers.js), this will still be the smallest number.
+            const firstNum = draw[0];
             if (firstNum >= 1 && firstNum <= CONFIG.TOTAL_NUMBERS) {
                 firstNumFrequency[firstNum]++;
             }

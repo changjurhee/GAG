@@ -139,8 +139,9 @@ async function getSequentialNumbers(rng) {
     history.forEach(draw => {
         if (!Array.isArray(draw) || draw.length < 6) return;
 
-        // Sort to ensure sequence
-        const sortedDraw = [...draw].sort((a, b) => a - b);
+        // Use raw draw order to capture actual sequence if available
+        // If data is pre-sorted, this will learn the sorted sequence pattern (small -> large)
+        const sortedDraw = draw;
 
         // Record first number
         const first = sortedDraw[0];
