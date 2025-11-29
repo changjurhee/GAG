@@ -12,6 +12,7 @@
     <div class="dashboard">
         <aside class="sidebar">
             <div class="sidebar-header">
+                <button id="settings-btn" class="sidebar-btn" title="Settings">⚙️</button>
                 <button id="sidebar-close" class="sidebar-btn" style="margin-left: auto;">«</button>
             </div>
             <div class="controls">
@@ -170,6 +171,38 @@
             </footer>
         </main>
     </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Data Settings ⚙️</h3>
+                <button id="settings-close" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Choose how to load official winning numbers:</p>
+                <div class="settings-options">
+                    <div class="settings-card" id="use-default-data">
+                        <div class="icon">🔄</div>
+                        <div class="info">
+                            <h4>Default Data</h4>
+                            <p>Reset to original server data.</p>
+                        </div>
+                    </div>
+                    <div class="settings-card" id="upload-excel-btn">
+                        <div class="icon">📂</div>
+                        <div class="info">
+                            <h4>Upload Excel</h4>
+                            <p>Load from Donghang Lottery .xls file.</p>
+                        </div>
+                        <input type="file" id="excel-upload" accept=".xls" class="hidden">
+                    </div>
+                </div>
+                <div id="upload-status" class="status-msg"></div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
     <script src="chart.js"></script>
     <script src="winning_numbers.js?v=2"></script>
@@ -181,6 +214,7 @@
     <script src="js/simulation.js?v=1"></script>
     <script src="js/ui.js?v=1"></script>
     <script src="js/ai.js?v=1"></script>
+    <script src="js/settings.js?v=1"></script>
     <script src="js/chart-renderer.js?v=1"></script>
     <script src="js/main.js?v=1"></script>
 </body>

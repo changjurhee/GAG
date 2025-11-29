@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v1.4.0] - 2025-11-30
+
+### Added
+- **Data Source Settings**: Added a settings modal to switch data sources.
+- **Excel Upload**: Users can now upload Donghang Lottery `.xls` files to update data client-side.
+- **Bug Fix**: Fixed settings modal visibility issue.
+
 ## [v1.3.0] - 2025-11-30
 
 ### Added

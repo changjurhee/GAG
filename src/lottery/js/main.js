@@ -83,6 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     // Initialize components
+    initSettings();
     initTabNavigation();
     loadHistory();
     initSimulationCanvas();
@@ -115,17 +116,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
             console.log(`Generating numbers using Algo: ${selectedAlgo}, RNG: ${selectedRngType}`);
 
+            // Refresh data to catch any updates (e.g. from Settings)
+            const currentWinningNumbers = typeof allWinningNumbers !== 'undefined' ? allWinningNumbers : [];
+
             let numbers = [];
             try {
                 // Get RNG function (might be async for blockchain/vrf)
                 const rngFunc = await getRNG(selectedRngType);
 
                 if (selectedAlgo === 'weighted') {
-                    numbers = await getWeightedNumbers(rngFunc);
+                    numbers = await getWeightedNumbers(rngFunc, currentWinningNumbers);
                 } else if (selectedAlgo === 'adaptive') {
-                    numbers = await getAdaptiveNumbers(rngFunc);
+                    numbers = await getAdaptiveNumbers(rngFunc, currentWinningNumbers);
                 } else if (selectedAlgo === 'non-frequency') {
-                    numbers = await getNonFrequencyNumbers(rngFunc);
+                    numbers = await getNonFrequencyNumbers(rngFunc, currentWinningNumbers);
                 } else if (selectedAlgo === 'sequential') {
                     // Use Deep Learning if available, otherwise fallback to simple Sequential
                     if (window.getDeepLearningNumbers && window.model) { // Check if model is trained
@@ -141,43 +145,66 @@ document.addEventListener('DOMContentLoaded', () => {
                 numbers = await getRandomNumbers(() => Math.random()); // Fallback
             }
 
-            const mainNumbers = numbers.slice(0, CONFIG.MAIN_NUMBERS_COUNT).sort((a, b) => a - b);
-            const bonusNumber = numbers[CONFIG.MAIN_NUMBERS_COUNT];
+            try {
+                if (!numbers || numbers.length < CONFIG.MAIN_NUMBERS_COUNT + CONFIG.BONUS_COUNT) {
+                    throw new Error("Generated numbers are invalid or insufficient.");
+                }
 
-            console.log("Main:", mainNumbers, "Bonus:", bonusNumber);
+                const mainNumbers = numbers.slice(0, CONFIG.MAIN_NUMBERS_COUNT).sort((a, b) => a - b);
+                const bonusNumber = numbers[CONFIG.MAIN_NUMBERS_COUNT];
 
-            let delay = 0;
+                console.log("Main:", mainNumbers, "Bonus:", bonusNumber);
 
-            // Display Main Numbers
-            mainNumbers.forEach((num) => {
+                let delay = 0;
+
+                // Display Main Numbers
+                mainNumbers.forEach((num) => {
+                    setTimeout(() => {
+                        createBall(num, ballContainer);
+                        playPopSound();
+                    }, delay);
+                    delay += CONFIG.ANIMATION_INTERVAL;
+                });
+
+                // Display Bonus Number
                 setTimeout(() => {
-                    createBall(num, ballContainer);
+                    ballContainer.appendChild(createPlusSign());
+
+                    const bonusBall = createBallElement(bonusNumber, true);
+                    ballContainer.appendChild(bonusBall);
                     playPopSound();
+
+                    // Add to history
+                    addToHistory([...mainNumbers, bonusNumber], selectedAlgo, selectedRngType);
+
                 }, delay);
-                delay += CONFIG.ANIMATION_INTERVAL;
-            });
 
-            // Display Bonus Number
-            setTimeout(() => {
-                ballContainer.appendChild(createPlusSign());
+                // Re-enable UI after animation starts (or estimate end)
+                // For simplicity, we re-enable immediately after scheduling timeouts, 
+                // but ideally we wait for the last one.
+                // The original code re-enabled inside the last timeout. 
+                // We'll keep that pattern but ensure safety.
+                setTimeout(() => {
+                    if (resetBtn) resetBtn.classList.remove('hidden');
+                    if (startBtn) {
+                        startBtn.disabled = false;
+                        startBtn.innerText = originalBtnText;
+                        startBtn.classList.remove('hidden');
+                        startBtn.classList.remove('disabled-look');
+                    }
+                }, delay + 100);
 
-                const bonusBall = createBallElement(bonusNumber, true);
-                ballContainer.appendChild(bonusBall);
-                playPopSound();
+            } catch (displayError) {
+                console.error("Display error:", displayError);
+                alert("An error occurred while displaying numbers. Please check the console.");
 
-                // Completion Logic
-                if (resetBtn) resetBtn.classList.remove('hidden');
+                // Ensure UI is reset even on error
                 if (startBtn) {
                     startBtn.disabled = false;
                     startBtn.innerText = originalBtnText;
-                    startBtn.classList.remove('hidden'); // Ensure it's visible if we hid it
                     startBtn.classList.remove('disabled-look');
                 }
-
-                // Add to history
-                addToHistory([...mainNumbers, bonusNumber], selectedAlgo, selectedRngType);
-
-            }, delay);
+            }
         }, 50); // Short delay to ensure repaint
     }
 });

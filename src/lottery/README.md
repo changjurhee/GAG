@@ -47,20 +47,41 @@ $$_{45}C_6 = \frac{45 \times 44 \times 43 \times 42 \times 41 \times 40}{6 \time
 1.  **`index.html` 파일 열기**
     *   파일 탐색기(Finder)에서 `index.html` 파일을 더블 클릭하여 웹 브라우저(Chrome, Safari 등)에서 엽니다.
 
-## 📊 데이터 업데이트 방법 (선택 사항)
+## 🛠️ 개발 및 테스트 환경 설정
 
-최신 당첨 번호 데이터를 반영하려면 동봉된 엑셀 파일을 처리하여 `winning_numbers.js`를 업데이트해야 합니다.
+이 프로젝트는 순수 JavaScript로 작성되었지만, 테스트 및 의존성 관리를 위해 Node.js 환경을 지원합니다.
 
-1.  **엑셀 파일 준비**
-    *   최신 로또 당첨 번호 엑셀 파일을 프로젝트 폴더에 둡니다.
-    *   파일명이 코드(`extract_numbers.py`)에 지정된 것과 일치해야 합니다.
+### 1. 설치 (Installation)
+프로젝트 루트에서 다음 명령어를 실행하여 테스트 의존성(Jest)을 설치합니다.
+```bash
+npm install
+```
 
-2.  **Python 스크립트 실행**
-    *   터미널을 열고 프로젝트 폴더로 이동하여 아래 명령어를 실행합니다:
-        ```bash
-        python extract_numbers.py
-        ```
-    *   실행이 완료되면 `winning_numbers.js` 파일이 갱신됩니다.
+### 2. 테스트 실행 (Running Tests)
+작성된 유닛 테스트(Unit Tests)를 실행하여 알고리즘의 정상 동작을 검증할 수 있습니다.
+```bash
+npm test
+```
+
+## 📊 데이터 업데이트 (Data Updates)
+
+최신 로또 당첨 번호를 가져오기 위해 두 가지 방법을 제공합니다.
+
+### 방법 A: 자동 웹 크롤링 (추천)
+Python 스크립트를 사용하여 동행복권 사이트에서 최신 데이터를 자동으로 가져옵니다.
+```bash
+python crawl_numbers.py
+```
+*   `winning_numbers.js` 파일이 자동으로 갱신됩니다.
+*   기존 데이터가 있다면 최신 회차만 추가로 가져옵니다 (Incremental Update).
+
+### 방법 B: 엑셀 파일 처리 (수동)
+동행복권 사이트에서 엑셀 파일을 다운로드 받아 처리할 수도 있습니다.
+1.  엑셀 파일을 프로젝트 폴더에 위치시킵니다.
+2.  `extract_numbers.py`를 실행합니다.
+    ```bash
+    python extract_numbers.py
+    ```
 
 ## 📂 프로젝트 구조
 

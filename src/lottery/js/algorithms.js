@@ -235,8 +235,20 @@ async function pickFromWeights(weights, rng) {
 }
 
 // Make algorithm functions available globally
-window.createPoolAndPick = createPoolAndPick;
-window.getWeightedNumbers = getWeightedNumbers;
-window.getAdaptiveNumbers = getAdaptiveNumbers;
-window.getNonFrequencyNumbers = getNonFrequencyNumbers;
-window.getSequentialNumbers = getSequentialNumbers;
+if (typeof window !== 'undefined') {
+    window.createPoolAndPick = createPoolAndPick;
+    window.getWeightedNumbers = getWeightedNumbers;
+    window.getAdaptiveNumbers = getAdaptiveNumbers;
+    window.getNonFrequencyNumbers = getNonFrequencyNumbers;
+    window.getSequentialNumbers = getSequentialNumbers;
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        createPoolAndPick,
+        getWeightedNumbers,
+        getAdaptiveNumbers,
+        getNonFrequencyNumbers,
+        getSequentialNumbers
+    };
+}

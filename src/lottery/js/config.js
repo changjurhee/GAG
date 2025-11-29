@@ -3,7 +3,7 @@
  */
 const CONFIG = {
     // Lottery settings
-    VERSION: 'v1.3.0',
+    VERSION: 'v1.4.0',
     TOTAL_NUMBERS: 45,
     MAIN_NUMBERS_COUNT: 6,
     BONUS_COUNT: 1,
@@ -37,4 +37,9 @@ const CONFIG = {
 };
 
 // Make CONFIG available globally
-window.CONFIG = CONFIG;
+if (typeof window !== 'undefined') {
+    window.CONFIG = CONFIG;
+}
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = CONFIG;
+}
