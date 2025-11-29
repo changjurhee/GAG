@@ -77,6 +77,7 @@
             <div class="tabs">
                 <button class="tab-btn active" data-tab="main-view">Main View 📊</button>
                 <button class="tab-btn" data-tab="history-view">History View 📜</button>
+                <button class="tab-btn" data-tab="winning-history-view">Winning History 🏆</button>
                 <button class="tab-btn" data-tab="simulation-view">Simulation ⚙️</button>
             </div>
 
@@ -95,6 +96,15 @@
                     <div id="history-log">
                         <!-- History items will be added here -->
                         <div class="history-placeholder">No history yet. Generate some numbers!</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="winning-history-view" class="tab-content">
+                <div class="history-section">
+                    <h3>Official Winning Numbers 🏆</h3>
+                    <div id="winning-history-log" class="history-log-container">
+                        <!-- Official history items will be added here -->
                     </div>
                 </div>
             </div>
