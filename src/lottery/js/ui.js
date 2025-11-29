@@ -212,6 +212,20 @@ function addToHistory(numbers, algoName, rngName) {
 }
 
 /**
+ * Helper to create a ball DOM element
+ * @param {number} number
+ * @param {boolean} isBonus
+ */
+function createBallElement(number, isBonus = false) {
+    const ball = document.createElement('div');
+    ball.classList.add('ball');
+    ball.classList.add(getBallRangeClass(number));
+    if (isBonus) ball.classList.add('bonus');
+    ball.textContent = number;
+    return ball;
+}
+
+/**
  * Create a ball and add it to the container
  * @param {number} number - The ball number
  * @param {HTMLElement} container - The container element
