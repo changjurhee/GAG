@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v1.5.0] - 2025-11-30
+
+### Added
+- **AI Simulation Training**: Added "Simulate & Train" feature to run 2,000 headless physics simulations and feed the data into the AI model.
+- **Architecture Documentation**: Added comprehensive `ARCHITECTURE.md` with Context, Module, Component, Class, and Sequence diagrams.
+- **QA Strategy**: Documented testing strategies and quality attributes in `ARCHITECTURE.md`.
+
+### Fixed
+- **Generation Bug**: Resolved an issue where the "Generate" button would freeze due to uncaught errors in the display logic.
+- **Data Loading**: Fixed `winning_numbers.js` to allow dynamic updates (changed `const` to `var`).
+
 ## [v1.4.0] - 2025-11-30
 
 ### Added

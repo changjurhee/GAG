@@ -44,11 +44,19 @@ function prepareData(history, windowSize = 5) {
 /**
  * Build and Train Model
  */
-async function trainAIModel(progressCallback) {
+async function trainAIModel(progressCallback, customData = null) {
     if (isTraining) return;
     isTraining = true;
 
-    const history = typeof allWinningNumbers !== 'undefined' ? allWinningNumbers : [];
+    let history = typeof allWinningNumbers !== 'undefined' ? [...allWinningNumbers] : [];
+
+    // Append custom data if provided (e.g., simulation results)
+    if (customData && Array.isArray(customData)) {
+        console.log(`Adding ${customData.length} simulated records to training data.`);
+        // Ensure format matches (array of numbers)
+        history = history.concat(customData);
+    }
+
     if (history.length < 10) {
         alert("Not enough history to train!");
         isTraining = false;

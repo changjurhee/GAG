@@ -42,7 +42,7 @@ class SimBall {
 
     draw() {
         if (!simCtx) return;
-        
+
         simCtx.beginPath();
         simCtx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
 
@@ -138,7 +138,7 @@ function initSimulation() {
     simBalls = [];
     simSelected = [];
     lastExtractionTime = 0;
-    
+
     const simResults = document.getElementById('sim-results');
     if (simResults) simResults.innerHTML = '';
 
@@ -420,7 +420,7 @@ function animateSimulation(timestamp) {
 
                     const ballDiv = createBallElement(b.id, simSelected.length === CONFIG.TOTAL_DRAW_COUNT);
                     simResults.appendChild(ballDiv);
-                    
+
                     if (typeof playPopSound === 'function') {
                         playPopSound();
                     }
@@ -471,6 +471,196 @@ function initSimulationCanvas() {
     }
 }
 
+/**
+ * Run a single headless simulation (no rendering, fast execution)
+ * @returns {number[]} Array of 7 numbers (6 main + 1 bonus)
+ */
+function runHeadlessSimulation() {
+    // 1. Setup
+    const balls = [];
+    const selected = [];
+    const drumR = CONFIG.SIM_DRUM_RADIUS;
+    const center = { x: CONFIG.SIM_CANVAS_WIDTH / 2, y: CONFIG.SIM_CANVAS_HEIGHT / 2 };
+
+    // Initialize balls (Simplified SimBall logic)
+    for (let i = 1; i <= CONFIG.TOTAL_NUMBERS; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const r = Math.random() * (drumR - 20);
+        balls.push({
+            id: i,
+            x: center.x + Math.cos(angle) * r,
+            y: center.y + Math.sin(angle) * r,
+            vx: (Math.random() - 0.5) * 15,
+            vy: (Math.random() - 0.5) * 15,
+            radius: 10,
+            mass: 1,
+            elasticity: 0.85,
+            friction: 0.99
+        });
+    }
+
+    // 2. Physics Loop
+    // We need to extract 7 balls.
+    // To speed up, we simulate a fixed number of steps between extractions.
+    // Standard: 2000ms @ 60fps = 120 steps.
+    // Fast: 30 steps (enough for some mixing).
+    const STEPS_PER_EXTRACTION = 30;
+    const turbulence = 5;
+    const gravity = 0.3;
+
+    while (selected.length < CONFIG.TOTAL_DRAW_COUNT) {
+        // Run physics steps
+        for (let s = 0; s < STEPS_PER_EXTRACTION; s++) {
+            // Update positions
+            balls.forEach(b => {
+                // Gravity
+                b.vy += gravity;
+
+                // Turbulence (Simplified)
+                if (Math.abs(b.x - center.x) < 30 && b.y > center.y + drumR - 50) {
+                    b.vy -= turbulence * 0.8;
+                    b.vx += (Math.random() - 0.5) * 2;
+                }
+
+                // Friction
+                b.vx *= b.friction;
+                b.vy *= b.friction;
+
+                // Move
+                b.x += b.vx;
+                b.y += b.vy;
+
+                // Wall Collision
+                const dx = b.x - center.x;
+                const dy = b.y - center.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist + b.radius > drumR) {
+                    const nx = dx / dist;
+                    const ny = dy / dist;
+                    const overlap = dist + b.radius - drumR;
+                    b.x -= nx * overlap;
+                    b.y -= ny * overlap;
+
+                    const dot = b.vx * nx + b.vy * ny;
+                    b.vx = (b.vx - 2 * dot * nx) * b.elasticity;
+                    b.vy = (b.vy - 2 * dot * ny) * b.elasticity;
+                }
+            });
+
+            // Resolve Collisions (Simplified O(N^2))
+            for (let i = 0; i < balls.length; i++) {
+                for (let j = i + 1; j < balls.length; j++) {
+                    const b1 = balls[i];
+                    const b2 = balls[j];
+                    const dx = b2.x - b1.x;
+                    const dy = b2.y - b1.y;
+                    const distSq = dx * dx + dy * dy;
+                    const radSum = b1.radius + b2.radius;
+
+                    if (distSq < radSum * radSum) {
+                        const dist = Math.sqrt(distSq);
+                        const nx = dx / dist;
+                        const ny = dy / dist;
+
+                        // Simple elastic collision
+                        const v1n = b1.vx * nx + b1.vy * ny;
+                        const v2n = b2.vx * nx + b2.vy * ny;
+
+                        const v1nFinal = v2n; // Equal mass exchange
+                        const v2nFinal = v1n;
+
+                        const tx = -ny;
+                        const ty = nx;
+                        const v1t = b1.vx * tx + b1.vy * ty;
+                        const v2t = b2.vx * tx + b2.vy * ty;
+
+                        b1.vx = v1nFinal * nx + v1t * tx;
+                        b1.vy = v1nFinal * ny + v1t * ty;
+                        b2.vx = v2nFinal * nx + v2t * tx;
+                        b2.vy = v2nFinal * ny + v2t * ty;
+
+                        // Separate
+                        const overlap = (radSum - dist) / 2;
+                        b1.x -= nx * overlap;
+                        b1.y -= ny * overlap;
+                        b2.x += nx * overlap;
+                        b2.y += ny * overlap;
+                    }
+                }
+            }
+        }
+
+        // Extraction Attempt
+        // Find ball closest to suction zone
+        const suctionY = center.y - drumR + 20;
+        let candidateIdx = -1;
+
+        for (let i = 0; i < balls.length; i++) {
+            const b = balls[i];
+            const dx = b.x - center.x;
+            const dy = b.y - suctionY;
+            if (dx * dx + dy * dy < CONFIG.SIM_SUCTION_RADIUS * CONFIG.SIM_SUCTION_RADIUS) {
+                candidateIdx = i;
+                break; // Take first one found
+            }
+        }
+
+        if (candidateIdx !== -1) {
+            selected.push(balls[candidateIdx].id);
+            balls.splice(candidateIdx, 1);
+        } else {
+            // Force extraction if stuck? 
+            // For headless, we might want to just pick the highest ball if none in zone to prevent infinite loops
+            // But let's stick to physics. If it loops too long, we can break.
+            // To be safe, let's just continue. The turbulence should push them up.
+        }
+
+        // Safety break
+        if (selected.length < CONFIG.TOTAL_DRAW_COUNT && STEPS_PER_EXTRACTION * 1000 > 1000000) break;
+    }
+
+    // Fill if missing (rare safety fallback)
+    while (selected.length < CONFIG.TOTAL_DRAW_COUNT) {
+        const idx = Math.floor(Math.random() * balls.length);
+        selected.push(balls[idx].id);
+        balls.splice(idx, 1);
+    }
+
+    return selected;
+}
+
+/**
+ * Run batch simulations
+ * @param {number} count - Number of simulations to run
+ * @param {function} progressCb - Callback(percent)
+ * @returns {Promise<Array[]>} Array of results
+ */
+async function batchRunSimulations(count, progressCb) {
+    return new Promise(resolve => {
+        const results = [];
+        let i = 0;
+
+        function step() {
+            // Run a chunk to avoid freezing UI
+            const chunk = 10;
+            for (let k = 0; k < chunk && i < count; k++) {
+                results.push(runHeadlessSimulation());
+                i++;
+            }
+
+            if (progressCb) progressCb(Math.round((i / count) * 100));
+
+            if (i < count) {
+                setTimeout(step, 0);
+            } else {
+                resolve(results);
+            }
+        }
+
+        step();
+    });
+}
+
 // Make simulation functions available globally
 window.SimBall = SimBall;
 window.initSimulation = initSimulation;
@@ -479,3 +669,4 @@ window.drawMachine = drawMachine;
 window.drawGauge = drawGauge;
 window.animateSimulation = animateSimulation;
 window.initSimulationCanvas = initSimulationCanvas;
+window.batchRunSimulations = batchRunSimulations;

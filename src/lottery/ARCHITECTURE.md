@@ -202,7 +202,7 @@ graph TD
 | Component | Layer | Description |
 | :--- | :--- | :--- |
 | **UI Manager** | Presentation | Manages the visual interface, user input, and navigation between views. |
-| **Simulation Engine** | Presentation | Visualizes the mechanical lottery process (drum, balls, physics). |
+| **Simulation Engine** | Presentation | Visualizes the mechanical lottery process (drum, balls, physics). Also supports **Headless Mode** for high-speed batch data generation. |
 | **Chart Renderer** | Presentation | Displays statistical data (frequency charts) to the user. |
 | **Main Controller** | Logic | The central brain that coordinates actions between the UI, Algorithms, and Data. |
 | **Algorithm Engine** | Logic | Encapsulates the core business logic for selecting winning numbers. |

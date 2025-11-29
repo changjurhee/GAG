@@ -82,6 +82,39 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 3000);
         });
     }
+
+    const simTrainBtn = document.getElementById('sim-train-btn');
+    if (simTrainBtn) {
+        simTrainBtn.addEventListener('click', async () => {
+            if (simTrainBtn.disabled) return;
+            simTrainBtn.disabled = true;
+            const originalText = simTrainBtn.innerText;
+            simTrainBtn.innerText = "Simulating... 0%";
+            progressDiv.classList.remove('hidden');
+
+            // 1. Run Batch Simulation
+            const simCount = 2000;
+            const simData = await batchRunSimulations(simCount, (percent) => {
+                simTrainBtn.innerText = `Simulating... ${percent}%`;
+                barDiv.style.width = `${percent}%`;
+            });
+
+            simTrainBtn.innerText = "Training AI... 🧠";
+
+            // 2. Train Model with Sim Data
+            await trainAIModel((epoch, loss) => {
+                epochSpan.innerText = epoch;
+                lossSpan.innerText = loss.toFixed(4);
+                barDiv.style.width = `${(epoch / 20) * 100}%`;
+            }, simData);
+
+            simTrainBtn.innerText = "Done! ✅";
+            setTimeout(() => {
+                simTrainBtn.disabled = false;
+                simTrainBtn.innerText = originalText;
+            }, 3000);
+        });
+    }
     // Initialize components
     initSettings();
     initTabNavigation();

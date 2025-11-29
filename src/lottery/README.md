@@ -38,6 +38,16 @@ $$_{45}C_6 = \frac{45 \times 44 \times 43 \times 42 \times 41 \times 40}{6 \time
     *   실제 비트코인 블록체인의 최신 블록 해시값을 가져와 시드(Seed)로 사용합니다.
     *   외부 세계의 예측 불가능한 데이터를 난수 생성의 원천으로 활용하는 방식입니다.
 
+5.  **AI & Physics Simulation**
+    *   **TensorFlow.js**: LSTM 모델을 사용하여 과거 당첨 번호 패턴을 학습합니다.
+    *   **Headless Simulation**: 2,000회의 물리 시뮬레이션을 고속으로 수행하여 AI 학습 데이터를 생성합니다.
+
+---
+
+## 🏗️ 아키텍처 (Architecture)
+
+이 프로젝트의 상세한 아키텍처, 다이어그램(Context, Module, Component, Class, Sequence), 그리고 QA 전략은 [ARCHITECTURE.md](ARCHITECTURE.md) 문서에서 확인할 수 있습니다.
+
 ---
 
 ## �🚀 실행 방법
