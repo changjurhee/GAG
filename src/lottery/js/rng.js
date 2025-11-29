@@ -44,6 +44,8 @@ async function getRNG(type) {
                     seedVal = ((seedVal << 5) - seedVal) + hash.charCodeAt(i);
                     seedVal |= 0;
                 }
+                // Mix in timestamp to ensure different results per click even within the same block time
+                seedVal += Date.now();
 
                 return () => {
                     let t = seedVal += 0x6D2B79F5;
