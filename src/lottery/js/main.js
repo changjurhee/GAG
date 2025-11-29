@@ -84,19 +84,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const simTrainBtn = document.getElementById('sim-train-btn');
-    if (simTrainBtn) {
+    const countInput = document.getElementById('sim-count-input');
+
+    if (simTrainBtn && countInput) {
+        // Update button text when input changes
+        const updateButtonText = () => {
+            const val = parseInt(countInput.value) || 2000;
+            simTrainBtn.innerText = `Simulate & Train (${val}x) 🌪️`;
+        };
+
+        countInput.addEventListener('input', updateButtonText);
+        countInput.addEventListener('change', updateButtonText);
+
+        // Initialize text
+        updateButtonText();
+
         simTrainBtn.addEventListener('click', async () => {
             if (simTrainBtn.disabled) return;
 
             // Get Sim Count from Settings
-            const countInput = document.getElementById('sim-count-input');
-            let simCount = 2000;
-            if (countInput) {
-                simCount = parseInt(countInput.value) || 2000;
-            }
+            let simCount = parseInt(countInput.value) || 2000;
 
             simTrainBtn.disabled = true;
+            // Store the dynamic text as original
             const originalText = simTrainBtn.innerText;
+
             simTrainBtn.innerText = `Simulating (${simCount})... 0%`;
             progressDiv.classList.remove('hidden');
 
@@ -121,7 +133,8 @@ document.addEventListener('DOMContentLoaded', () => {
             simTrainBtn.innerText = "Done! ✅";
             setTimeout(() => {
                 simTrainBtn.disabled = false;
-                simTrainBtn.innerText = originalText;
+                // Restore the dynamic text (re-read input in case it changed, though unlikely during disabled)
+                updateButtonText();
             }, 3000);
         });
     }
