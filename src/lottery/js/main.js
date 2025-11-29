@@ -216,17 +216,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 console.log("Main:", mainNumbers, "Bonus:", bonusNumber);
 
-                let delay = 0;
-
-                // Display Main Numbers
-                mainNumbers.forEach((num) => {
-                    setTimeout(() => {
-                        createBall(num, ballContainer);
-                        playPopSound();
-                    }, delay);
-                    delay += CONFIG.ANIMATION_INTERVAL;
-                });
-
                 // 4. Display
                 const shouldSort = selectedAlgo !== 'sequential';
                 displayNumbers(numbers, ballContainer, shouldSort);
