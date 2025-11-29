@@ -227,42 +227,35 @@ document.addEventListener('DOMContentLoaded', () => {
                     delay += CONFIG.ANIMATION_INTERVAL;
                 });
 
-                // Display Bonus Number
+                // 4. Display
+                const shouldSort = selectedAlgo !== 'sequential';
+                displayNumbers(numbers, ballContainer, shouldSort);
+                addToHistory(numbers, getAlgoName(selectedAlgo), getRngName(selectedRngType));
+
+                // Re-enable UI after animation starts (or estimate end)
+                // For simplicity, we re-enable immediately after scheduling timeouts, 
+                // but ideally we wait for the last one.
+                const delay = (CONFIG.MAIN_NUMBERS_COUNT + 1) * CONFIG.DISPLAY_INTERVAL + 500;
                 setTimeout(() => {
-                    ballContainer.appendChild(createPlusSign());
-                    console.log("Generated numbers:", numbers);
-
-                    // 4. Display
-                    const shouldSort = selectedAlgo !== 'sequential';
-                    const totalAnimationDelay = await displayNumbers(numbers, ballContainer, shouldSort);
-                    addToHistory(numbers, getAlgoName(selectedAlgo), getRngName(selectedRngType));
-
-                    // Re-enable UI after animation starts (or estimate end)
-                    // For simplicity, we re-enable immediately after scheduling timeouts, 
-                    // but ideally we wait for the last one.
-                    // The original code re-enabled inside the last timeout. 
-                    // We'll keep that pattern but ensure safety.
-                    setTimeout(() => {
-                        if (resetBtn) resetBtn.classList.remove('hidden');
-                        if (startBtn) {
-                            startBtn.disabled = false;
-                            startBtn.innerText = originalBtnText;
-                            startBtn.classList.remove('hidden');
-                            startBtn.classList.remove('disabled-look');
-                        }
-                    }, delay + 100);
-
-                } catch (displayError) {
-                    console.error("Display error:", displayError);
-                    alert("An error occurred while displaying numbers. Please check the console.");
-
-                    // Ensure UI is reset even on error
+                    if (resetBtn) resetBtn.classList.remove('hidden');
                     if (startBtn) {
                         startBtn.disabled = false;
                         startBtn.innerText = originalBtnText;
+                        startBtn.classList.remove('hidden');
                         startBtn.classList.remove('disabled-look');
                     }
+                }, delay);
+
+            } catch (displayError) {
+                console.error("Display error:", displayError);
+                alert("An error occurred while displaying numbers. Please check the console.");
+
+                // Ensure UI is reset even on error
+                if (startBtn) {
+                    startBtn.disabled = false;
+                    startBtn.innerText = originalBtnText;
+                    startBtn.classList.remove('disabled-look');
                 }
-            }, 50); // Short delay to ensure repaint
+            }
+        }, 50); // Short delay to ensure repaint
     }
-});
