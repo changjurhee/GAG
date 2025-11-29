@@ -92,6 +92,10 @@ body {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 5px;
+    /* Prevent scrollbar overlap */
 }
 
 .options {
@@ -142,6 +146,8 @@ body {
 #start-btn {
     width: 100%;
     padding: 14px;
+    margin-top: 1rem;
+    /* Separate from scrollable area */
     font-size: 1.1rem;
     border: none;
     border-radius: 12px;
