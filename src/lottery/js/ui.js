@@ -226,13 +226,18 @@ function createBall(number, container) {
  * Display numbers with animation
  * @param {number[]} numbers - Array of 7 numbers
  * @param {HTMLElement} container - The ball container element
+ * @param {boolean} shouldSort - Whether to sort the main numbers (default: true)
  */
-function displayNumbers(numbers, container) {
+function displayNumbers(numbers, container, shouldSort = true) {
     if (!container) return;
     container.innerHTML = '';
 
     // Separate Main (6) and Bonus (1)
-    const mainNumbers = numbers.slice(0, CONFIG.MAIN_NUMBERS_COUNT).sort((a, b) => a - b);
+    let mainNumbers = numbers.slice(0, CONFIG.MAIN_NUMBERS_COUNT);
+
+    if (shouldSort) {
+        mainNumbers.sort((a, b) => a - b);
+    }
     const bonusNumber = numbers[CONFIG.MAIN_NUMBERS_COUNT];
 
     mainNumbers.forEach((num, index) => {
