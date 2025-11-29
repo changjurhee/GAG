@@ -45,73 +45,86 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     async function generateNumbers() {
         initAudio();
+
+        // 1. Immediate UI Feedback
+        const originalBtnText = startBtn ? startBtn.innerText : 'Generate';
         if (startBtn) {
             startBtn.disabled = true;
-            startBtn.classList.add('hidden');
+            startBtn.innerText = "Generating... ⏳";
+            startBtn.classList.add('disabled-look'); // Optional styling
         }
         if (resetBtn) resetBtn.classList.add('hidden');
         if (ballContainer) ballContainer.innerHTML = '';
 
-        const selectedAlgoInput = document.querySelector('input[name="algorithm"]:checked');
-        const selectedAlgo = selectedAlgoInput ? selectedAlgoInput.value : 'random';
+        // 2. Yield to browser to allow UI repaint (Spinner/Text update)
+        // This prevents the "frozen" feeling
+        setTimeout(async () => {
+            const selectedAlgoInput = document.querySelector('input[name="algorithm"]:checked');
+            const selectedAlgo = selectedAlgoInput ? selectedAlgoInput.value : 'random';
 
-        const selectedRngInput = document.querySelector('input[name="rng"]:checked');
-        const selectedRngType = selectedRngInput ? selectedRngInput.value : 'prng';
+            const selectedRngInput = document.querySelector('input[name="rng"]:checked');
+            const selectedRngType = selectedRngInput ? selectedRngInput.value : 'prng';
 
-        console.log(`Generating numbers using Algo: ${selectedAlgo}, RNG: ${selectedRngType}`);
+            console.log(`Generating numbers using Algo: ${selectedAlgo}, RNG: ${selectedRngType}`);
 
-        let numbers = [];
-        try {
-            // Get RNG function (might be async for blockchain/vrf)
-            const rngFunc = await getRNG(selectedRngType);
+            let numbers = [];
+            try {
+                // Get RNG function (might be async for blockchain/vrf)
+                const rngFunc = await getRNG(selectedRngType);
 
-            if (selectedAlgo === 'weighted') {
-                numbers = await getWeightedNumbers(rngFunc);
-            } else if (selectedAlgo === 'adaptive') {
-                numbers = await getAdaptiveNumbers(rngFunc);
-            } else if (selectedAlgo === 'non-frequency') {
-                numbers = await getNonFrequencyNumbers(rngFunc);
-            } else if (selectedAlgo === 'sequential') {
-                numbers = await getSequentialNumbers(rngFunc);
-            } else {
-                numbers = await getRandomNumbers(rngFunc);
+                if (selectedAlgo === 'weighted') {
+                    numbers = await getWeightedNumbers(rngFunc);
+                } else if (selectedAlgo === 'adaptive') {
+                    numbers = await getAdaptiveNumbers(rngFunc);
+                } else if (selectedAlgo === 'non-frequency') {
+                    numbers = await getNonFrequencyNumbers(rngFunc);
+                } else if (selectedAlgo === 'sequential') {
+                    numbers = await getSequentialNumbers(rngFunc);
+                } else {
+                    numbers = await getRandomNumbers(rngFunc);
+                }
+            } catch (e) {
+                console.error("Generation error:", e);
+                numbers = await getRandomNumbers(() => Math.random()); // Fallback
             }
-        } catch (e) {
-            console.error("Generation error:", e);
-            numbers = await getRandomNumbers(() => Math.random()); // Fallback
-        }
 
-        const mainNumbers = numbers.slice(0, CONFIG.MAIN_NUMBERS_COUNT).sort((a, b) => a - b);
-        const bonusNumber = numbers[CONFIG.MAIN_NUMBERS_COUNT];
+            const mainNumbers = numbers.slice(0, CONFIG.MAIN_NUMBERS_COUNT).sort((a, b) => a - b);
+            const bonusNumber = numbers[CONFIG.MAIN_NUMBERS_COUNT];
 
-        console.log("Main:", mainNumbers, "Bonus:", bonusNumber);
+            console.log("Main:", mainNumbers, "Bonus:", bonusNumber);
 
-        let delay = 0;
+            let delay = 0;
 
-        // Display Main Numbers
-        mainNumbers.forEach((num) => {
+            // Display Main Numbers
+            mainNumbers.forEach((num) => {
+                setTimeout(() => {
+                    createBall(num, ballContainer);
+                    playPopSound();
+                }, delay);
+                delay += CONFIG.ANIMATION_INTERVAL;
+            });
+
+            // Display Bonus Number
             setTimeout(() => {
-                createBall(num, ballContainer);
+                ballContainer.appendChild(createPlusSign());
+
+                const bonusBall = createBallElement(bonusNumber, true);
+                ballContainer.appendChild(bonusBall);
                 playPopSound();
+
+                // Completion Logic
+                if (resetBtn) resetBtn.classList.remove('hidden');
+                if (startBtn) {
+                    startBtn.disabled = false;
+                    startBtn.innerText = originalBtnText;
+                    startBtn.classList.remove('hidden'); // Ensure it's visible if we hid it
+                    startBtn.classList.remove('disabled-look');
+                }
+
+                // Add to history
+                addToHistory([...mainNumbers, bonusNumber], selectedAlgo, selectedRngType);
+
             }, delay);
-            delay += CONFIG.ANIMATION_INTERVAL;
-        });
-
-        // Display Bonus Number
-        setTimeout(() => {
-            ballContainer.appendChild(createPlusSign());
-
-            const bonusBall = createBallElement(bonusNumber, true);
-            ballContainer.appendChild(bonusBall);
-            playPopSound();
-
-            // Completion Logic
-            if (resetBtn) resetBtn.classList.remove('hidden');
-            if (startBtn) startBtn.disabled = false;
-
-            // Add to history
-            addToHistory([...mainNumbers, bonusNumber], selectedAlgo, selectedRngType);
-
-        }, delay);
+        }, 50); // Short delay to ensure repaint
     }
 });

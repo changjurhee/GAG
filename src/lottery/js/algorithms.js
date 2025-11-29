@@ -130,28 +130,36 @@ async function getNonFrequencyNumbers(rng, winningNumbers = []) {
  * @param {Function} rng - Random number generator function
  * @returns {Promise<number[]>} Array of selected numbers
  */
+// Cache for transitions to avoid rebuilding on every click
+let cachedTransitions = null;
+
 async function getSequentialNumbers(rng) {
-    const transitions = {}; // { 1: { 2: 5, 3: 2 }, ... }
-
     // 1. Build Transition Matrix from History (Learning Phase)
-    const history = typeof allWinningNumbers !== 'undefined' ? allWinningNumbers : [];
+    // Use cached version if available
+    if (!cachedTransitions) {
+        const transitions = {};
+        const history = typeof allWinningNumbers !== 'undefined' ? allWinningNumbers : [];
 
-    history.forEach(draw => {
-        if (!Array.isArray(draw) || draw.length < 6) return;
+        history.forEach(draw => {
+            if (!Array.isArray(draw) || draw.length < 6) return;
 
-        // Use raw draw order (assuming it represents extraction order)
-        // If data is pre-sorted, this learns the sorted pattern.
-        const sequence = draw;
+            // Use raw draw order (assuming it represents extraction order)
+            // If data is pre-sorted, this learns the sorted pattern.
+            const sequence = draw;
 
-        // Record transitions (State -> Next State)
-        for (let i = 0; i < sequence.length - 1; i++) {
-            const current = sequence[i];
-            const next = sequence[i + 1];
+            // Record transitions (State -> Next State)
+            for (let i = 0; i < sequence.length - 1; i++) {
+                const current = sequence[i];
+                const next = sequence[i + 1];
 
-            if (!transitions[current]) transitions[current] = {};
-            transitions[current][next] = (transitions[current][next] || 0) + 1;
-        }
-    });
+                if (!transitions[current]) transitions[current] = {};
+                transitions[current][next] = (transitions[current][next] || 0) + 1;
+            }
+        });
+        cachedTransitions = transitions;
+    }
+
+    const transitions = cachedTransitions;
 
     const result = [];
 
