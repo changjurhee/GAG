@@ -212,6 +212,21 @@ function addToHistory(numbers, algoName, rngName) {
 }
 
 /**
+ * Generate HTML for balls
+ * @param {number[]} mainNumbers
+ * @param {number} bonusNumber
+ */
+function generateBallsHTML(mainNumbers, bonusNumber) {
+    let html = '';
+    mainNumbers.forEach(num => {
+        html += `<div class="ball ${getBallRangeClass(num)}">${num}</div>`;
+    });
+    html += `<div class="plus-sign">+</div>`;
+    html += `<div class="ball bonus ${getBallRangeClass(bonusNumber)}">${bonusNumber}</div>`;
+    return html;
+}
+
+/**
  * Get CSS class for ball color based on number range
  * @param {number} number
  * @returns {string} CSS class name
