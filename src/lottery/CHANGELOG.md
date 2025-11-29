@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v1.3.0] - 2025-11-30
+
+### Added
+- **Deep Learning (TensorFlow.js)**: Integrated a real LSTM neural network for number prediction.
+- **Training UI**: Added a "Train Model" panel with real-time loss/epoch visualization.
+
 ## [v1.2.0] - 2025-11-30
 
 ### Added

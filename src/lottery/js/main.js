@@ -37,7 +37,51 @@ document.addEventListener('DOMContentLoaded', () => {
     if (sidebarOpen) {
         sidebarOpen.addEventListener('click', () => toggleSidebar(sidebar, sidebarOpen));
     }
+    if (sidebarOpen) {
+        sidebarOpen.addEventListener('click', () => toggleSidebar(sidebar, sidebarOpen));
+    }
 
+    // AI UI Toggle
+    const algoRadios = document.querySelectorAll('input[name="algorithm"]');
+    const aiPanel = document.getElementById('ai-training-panel');
+    const trainBtn = document.getElementById('train-ai-btn');
+    const progressDiv = document.getElementById('training-progress');
+    const lossSpan = document.getElementById('ai-loss');
+    const epochSpan = document.getElementById('ai-epoch');
+    const barDiv = document.getElementById('ai-bar');
+
+    algoRadios.forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            if (e.target.value === 'sequential') {
+                aiPanel.classList.remove('hidden');
+            } else {
+                aiPanel.classList.add('hidden');
+            }
+        });
+    });
+
+    if (trainBtn) {
+        trainBtn.addEventListener('click', async () => {
+            trainBtn.disabled = true;
+            progressDiv.classList.remove('hidden');
+
+            await trainAIModel((epoch, loss) => {
+                epochSpan.innerText = epoch;
+                lossSpan.innerText = loss.toFixed(4);
+                barDiv.style.width = `${(epoch / 20) * 100}%`;
+            });
+
+            trainBtn.innerText = "Model Trained ✅";
+            trainBtn.style.background = "#55efc4";
+            trainBtn.style.color = "#2d3436";
+            setTimeout(() => {
+                trainBtn.disabled = false;
+                trainBtn.innerText = "Retrain Model 🧠";
+                trainBtn.style.background = "white";
+                trainBtn.style.color = "#d63031";
+            }, 3000);
+        });
+    }
     // Initialize components
     initTabNavigation();
     loadHistory();
@@ -83,7 +127,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else if (selectedAlgo === 'non-frequency') {
                     numbers = await getNonFrequencyNumbers(rngFunc);
                 } else if (selectedAlgo === 'sequential') {
-                    numbers = await getSequentialNumbers(rngFunc);
+                    // Use Deep Learning if available, otherwise fallback to simple Sequential
+                    if (window.getDeepLearningNumbers && window.model) { // Check if model is trained
+                        numbers = await window.getDeepLearningNumbers(rngFunc);
+                    } else {
+                        numbers = await getSequentialNumbers(rngFunc);
+                    }
                 } else {
                     numbers = await getRandomNumbers(rngFunc);
                 }

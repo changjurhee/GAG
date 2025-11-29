@@ -3,7 +3,7 @@
  */
 const CONFIG = {
     // Lottery settings
-    VERSION: 'v1.2.0',
+    VERSION: 'v1.3.0',
     TOTAL_NUMBERS: 45,
     MAIN_NUMBERS_COUNT: 6,
     BONUS_COUNT: 1,
