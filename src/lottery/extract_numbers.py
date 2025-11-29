@@ -54,6 +54,7 @@ def parse_excel_html():
                 
                 if all(1 <= x <= 45 for x in nums):
                     main_numbers = nums[:6]
+                    # Do NOT sort main_numbers to preserve extraction order
                     bonus = nums[6]
                     all_data.append({'round': round_num, 'main': main_numbers, 'bonus': bonus})
                 

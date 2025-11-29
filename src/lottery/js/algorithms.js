@@ -124,33 +124,29 @@ async function getNonFrequencyNumbers(rng, winningNumbers = []) {
 }
 
 /**
- * Generate numbers using Sequential Analysis (Markov Chain)
- * Analyzes the probability of Number B following Number A in sorted draws.
+ * Generate numbers using RL-based Sequential Analysis (Markov Chain)
+ * Step 1: Pick first number using pure RNG (Exploration)
+ * Step 2+: Pick subsequent numbers based on Transition Matrix (Exploitation)
  * @param {Function} rng - Random number generator function
  * @returns {Promise<number[]>} Array of selected numbers
  */
 async function getSequentialNumbers(rng) {
     const transitions = {}; // { 1: { 2: 5, 3: 2 }, ... }
-    const firstNumbers = {}; // { 1: 10, 2: 5, ... }
 
-    // 1. Build Transition Matrix from History
+    // 1. Build Transition Matrix from History (Learning Phase)
     const history = typeof allWinningNumbers !== 'undefined' ? allWinningNumbers : [];
 
     history.forEach(draw => {
         if (!Array.isArray(draw) || draw.length < 6) return;
 
-        // Use raw draw order to capture actual sequence if available
-        // If data is pre-sorted, this will learn the sorted sequence pattern (small -> large)
-        const sortedDraw = draw;
+        // Use raw draw order (assuming it represents extraction order)
+        // If data is pre-sorted, this learns the sorted pattern.
+        const sequence = draw;
 
-        // Record first number
-        const first = sortedDraw[0];
-        firstNumbers[first] = (firstNumbers[first] || 0) + 1;
-
-        // Record transitions
-        for (let i = 0; i < sortedDraw.length - 1; i++) {
-            const current = sortedDraw[i];
-            const next = sortedDraw[i + 1];
+        // Record transitions (State -> Next State)
+        for (let i = 0; i < sequence.length - 1; i++) {
+            const current = sequence[i];
+            const next = sequence[i + 1];
 
             if (!transitions[current]) transitions[current] = {};
             transitions[current][next] = (transitions[current][next] || 0) + 1;
@@ -159,47 +155,40 @@ async function getSequentialNumbers(rng) {
 
     const result = [];
 
-    // 2. Pick First Number
-    const firstNum = await pickFromWeights(firstNumbers, rng);
+    // 2. Step 1: Random Start (Exploration)
+    // Unlike the previous version which used frequency, we now use pure RNG 
+    // to give the "AI" a random starting point.
+    const r = await rng();
+    const firstNum = Math.floor(r * CONFIG.TOTAL_NUMBERS) + 1;
     result.push(firstNum);
 
-    // 3. Pick Subsequent Numbers
+    // 3. Step 2+: Follow the Chain (Exploitation)
     let currentNum = firstNum;
 
     while (result.length < 6) {
         let nextNum;
 
-        // Check if we have transition data for current number
+        // Check if we have learned transitions for the current state
         if (transitions[currentNum]) {
             // Filter out numbers already picked to avoid duplicates
             const candidates = { ...transitions[currentNum] };
             result.forEach(picked => delete candidates[picked]);
 
             if (Object.keys(candidates).length > 0) {
-                // Pick based on transition probability
+                // Pick based on transition probability (Softmax-like selection)
                 nextNum = await pickFromWeights(candidates, rng);
             }
         }
 
-        // Fallback: If no transition data or all candidates picked
+        // Fallback: If no learned path or dead end
         if (!nextNum) {
-            // Pick a random number greater than current (to maintain sorted order preference if possible)
-            // But standard lottery doesn't strictly require sorted generation, just unique.
-            // Let's pick any available number, preferably higher to mimic typical sequence.
+            // Pick a random available number (Exploration)
             const available = [];
-            for (let i = 1; i <= 45; i++) {
+            for (let i = 1; i <= CONFIG.TOTAL_NUMBERS; i++) {
                 if (!result.includes(i)) available.push(i);
             }
-
-            // Try to pick higher numbers first to look natural
-            const higher = available.filter(n => n > currentNum);
-            if (higher.length > 0) {
-                const r = await rng();
-                nextNum = higher[Math.floor(r * higher.length)];
-            } else {
-                const r = await rng();
-                nextNum = available[Math.floor(r * available.length)];
-            }
+            const r2 = await rng();
+            nextNum = available[Math.floor(r2 * available.length)];
         }
 
         result.push(nextNum);
@@ -208,11 +197,11 @@ async function getSequentialNumbers(rng) {
 
     // 4. Pick Bonus Number (Randomly from remaining)
     const availableForBonus = [];
-    for (let i = 1; i <= 45; i++) {
+    for (let i = 1; i <= CONFIG.TOTAL_NUMBERS; i++) {
         if (!result.includes(i)) availableForBonus.push(i);
     }
-    const r = await rng();
-    const bonus = availableForBonus[Math.floor(r * availableForBonus.length)];
+    const r3 = await rng();
+    const bonus = availableForBonus[Math.floor(r3 * availableForBonus.length)];
     result.push(bonus);
 
     return result;
