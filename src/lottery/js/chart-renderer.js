@@ -45,16 +45,9 @@ function renderChart(winningNumbers = [], bonusNumbers = [], simulationData = []
     if (simulationData && simulationData.length > 0) {
         simulationData.forEach(draw => {
             if (Array.isArray(draw) && draw.length > 0) {
-                // Assuming sim data is sorted or we take the first element as "start"
-                // The headless sim returns [main..., bonus], but usually sorted main.
-                // Let's ensure we take the min of the main numbers just in case.
-                // Actually, runHeadlessSimulation returns `selected` which is pushed in order of extraction.
-                // But batchRunSimulations returns the result of runHeadlessSimulation.
-                // runHeadlessSimulation returns `selected`. 
-                // Wait, `runHeadlessSimulation` returns `selected` which is extraction order.
-                // We should sort the first 6 to find the "start number" (smallest).
-                const main = draw.slice(0, 6).sort((a, b) => a - b);
-                const first = main[0];
+                // The headless sim returns `selected` which is pushed in order of extraction.
+                // We must NOT sort it, as we want the actual first drawn number (Start Number).
+                const first = draw[0];
                 if (first >= 1 && first <= CONFIG.TOTAL_NUMBERS) {
                     simFirstNumFrequency[first]++;
                 }
