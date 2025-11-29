@@ -127,8 +127,25 @@ graph TD
     Main --> ChartRenderer
     Algo --> RNG
     UI --> Utils
+    UI --> Utils
     Sim --> Utils
 ```
+
+#### Module Descriptions
+
+| Module | Description | Responsibilities |
+| :--- | :--- | :--- |
+| **Main** | `main.js` | Application entry point. Initializes components, handles global events, and orchestrates the generation flow. |
+| **Config** | `config.js` | Configuration store. Holds constants like version, animation speeds, and game rules. |
+| **UI** | `ui.js` | UI Manager. Handles DOM manipulation, event listeners for UI elements, and view switching. |
+| **Algo** | `algorithms.js` | Algorithm Engine. Contains implementations for Weighted, Adaptive, Cold, and Sequential generation strategies. |
+| **RNG** | `rng.js` | Random Number Generator. Provides abstract interface for PRNG, Secure Crypto, VRF, and Blockchain randomness. |
+| **Sim** | `simulation.js` | Physics Simulation. Renders the lottery drum animation using HTML5 Canvas. |
+| **AI** | `ai.js` | AI Model. Manages TensorFlow.js model creation, training, and prediction. |
+| **Settings** | `settings.js` | Settings Manager. Handles user preferences and data ingestion (Excel upload). |
+| **ChartRenderer** | `chart-renderer.js` | Chart Visualizer. Wrapper around Chart.js to render frequency statistics. |
+| **Utils** | `utils.js` | Utilities. Helper functions for math, DOM creation, and formatting. |
+
 
 ### 3. Component View
 Logical breakdown of the application's internal components.
@@ -167,8 +184,25 @@ graph TD
     Algo --> TF
 
     UI --> Sim
+    UI --> Sim
     UI --> Chart
 ```
+
+#### Component Descriptions
+
+| Component | Layer | Description |
+| :--- | :--- | :--- |
+| **UI Manager** | Presentation | Manages the visual interface, user input, and navigation between views. |
+| **Simulation Engine** | Presentation | Visualizes the mechanical lottery process (drum, balls, physics). |
+| **Chart Renderer** | Presentation | Displays statistical data (frequency charts) to the user. |
+| **Main Controller** | Logic | The central brain that coordinates actions between the UI, Algorithms, and Data. |
+| **Algorithm Engine** | Logic | Encapsulates the core business logic for selecting winning numbers. |
+| **RNG Service** | Logic | Provides a unified interface for various sources of randomness. |
+| **Settings Manager** | Data | Handles configuration persistence and external data loading. |
+| **History Manager** | Data | Manages the storage and retrieval of user generation history (localStorage). |
+| **Official Data Store** | Data | The read-only source of truth for past winning numbers (`winning_numbers.js`). |
+| **TensorFlow Model** | AI | A machine learning model that learns sequences from historical data. |
+
 
 ### 4. Class Diagram
 Representation of the key modules as classes/objects.
