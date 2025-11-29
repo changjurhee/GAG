@@ -22,6 +22,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const recentBonusNumbers = typeof allBonusNumbers !== 'undefined' ? allBonusNumbers : [];
     console.log(`Loaded ${recentWinningNumbers.length} past draws.`);
 
+    // Set Version
+    const versionEl = document.getElementById('app-version');
+    if (versionEl) versionEl.innerText = CONFIG.VERSION;
+
     // Event Listeners
     if (startBtn) startBtn.addEventListener('click', generateNumbers);
     if (resetBtn) resetBtn.addEventListener('click', () => resetGame(ballContainer, startBtn, resetBtn));
