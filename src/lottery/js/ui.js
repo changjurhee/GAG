@@ -263,19 +263,19 @@ function resetGame(ballContainer, startBtn, resetBtn) {
     if (resetBtn) resetBtn.classList.add('hidden');
 }
 
+// Pagination State
+let currentHistoryIndex = 0;
+const INITIAL_BATCH_SIZE = 20;
+const LOAD_BATCH_SIZE = 50;
+
 /**
- * Render official winning history
+ * Render official winning history with pagination
  */
 function renderWinningHistory() {
     const container = document.getElementById('winning-history-log');
     if (!container) return;
 
-    // 1. Cache Check: If already populated, do nothing (Instant switch)
-    if (container.querySelector('.history-item')) {
-        return;
-    }
-
-    // 2. Show Loading State
+    // 1. Show Loading State
     container.innerHTML = '<div class="history-placeholder">Loading official history... ⏳</div>';
 
     if (typeof allWinningNumbers === 'undefined' || typeof allBonusNumbers === 'undefined') {
@@ -283,45 +283,75 @@ function renderWinningHistory() {
         return;
     }
 
-    // 3. Async Render to allow UI to show "Loading..."
+    // 3. Async Render
     setTimeout(() => {
-        // Use a document fragment for performance
-        const fragment = document.createDocumentFragment();
+        container.innerHTML = ''; // Clear loading message
+        currentHistoryIndex = 0;  // Reset index
+        renderHistoryBatch(INITIAL_BATCH_SIZE);
+    }, 50);
+}
 
-        // Iterate through all winning numbers (assuming latest first)
-        const totalRounds = allWinningNumbers.length;
-        // Check if dates are available
-        const dates = typeof allWinningDates !== 'undefined' ? allWinningDates : [];
+/**
+ * Render a batch of history items
+ * @param {number} batchSize - Number of items to load
+ */
+function renderHistoryBatch(batchSize) {
+    const container = document.getElementById('winning-history-log');
+    if (!container) return;
 
-        allWinningNumbers.forEach((mainNumbers, index) => {
-            const round = totalRounds - index;
-            const bonus = allBonusNumbers[index];
-            const date = dates[index] || ''; // Get date if available
+    // Remove existing "Load More" button if any
+    const existingBtn = document.getElementById('load-more-btn');
+    if (existingBtn) existingBtn.remove();
 
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'history-item';
+    const totalRounds = allWinningNumbers.length;
+    const dates = typeof allWinningDates !== 'undefined' ? allWinningDates : [];
 
-            // Generate balls HTML
-            const sortedMain = [...mainNumbers].sort((a, b) => a - b);
-            const ballsHtml = generateBallsHTML(sortedMain, bonus);
+    // Calculate end index
+    const endIndex = Math.min(currentHistoryIndex + batchSize, totalRounds);
 
-            itemDiv.innerHTML = `
-                <div class="history-header">
-                    <span class="history-date">Round ${round} <small style="color: #aaa; margin-left: 5px;">(${date})</small></span>
-                    <span class="history-info">Official Result 🏆</span>
-                </div>
-                <div class="history-balls">
-                    ${ballsHtml}
-                </div>
-            `;
-            fragment.appendChild(itemDiv);
-        });
+    // Use fragment
+    const fragment = document.createDocumentFragment();
 
-        // Clear loading message and append all items
-        container.innerHTML = '';
-        container.appendChild(fragment);
+    for (let i = currentHistoryIndex; i < endIndex; i++) {
+        const mainNumbers = allWinningNumbers[i];
+        const bonus = allBonusNumbers[i];
+        const round = totalRounds - i;
+        const date = dates[i] || '';
 
-    }, 50); // Short delay to render loading state
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'history-item';
+
+        const sortedMain = [...mainNumbers].sort((a, b) => a - b);
+        const ballsHtml = generateBallsHTML(sortedMain, bonus);
+
+        itemDiv.innerHTML = `
+            <div class="history-header">
+                <span class="history-date">Round ${round} <small style="color: #aaa; margin-left: 5px;">(${date})</small></span>
+                <span class="history-info">Official Result 🏆</span>
+            </div>
+            <div class="history-balls">
+                ${ballsHtml}
+            </div>
+        `;
+        fragment.appendChild(itemDiv);
+    }
+
+    container.appendChild(fragment);
+    currentHistoryIndex = endIndex;
+
+    // Add "Load More" button if there are more items
+    if (currentHistoryIndex < totalRounds) {
+        const remaining = totalRounds - currentHistoryIndex;
+        const nextBatch = Math.min(LOAD_BATCH_SIZE, remaining);
+
+        const btn = document.createElement('button');
+        btn.id = 'load-more-btn';
+        btn.className = 'load-more-btn';
+        btn.innerHTML = `Load More (${nextBatch} / ${remaining}) 🔽`;
+        btn.onclick = () => renderHistoryBatch(LOAD_BATCH_SIZE);
+
+        container.appendChild(btn);
+    }
 }
 
 // Make UI functions available globally

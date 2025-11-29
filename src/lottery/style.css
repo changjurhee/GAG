@@ -556,3 +556,24 @@ input[type=range]::-webkit-slider-thumb:hover {
 .bonus-ball-small {
     border: 2px solid #f1c40f;
 }
+
+/* Load More Button */
+.load-more-btn {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    background: white;
+    border: 2px dashed #b2bec3;
+    color: #636e72;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.load-more-btn:hover {
+    background: #dfe6e9;
+    color: #2d3436;
+    border-color: #636e72;
+}
