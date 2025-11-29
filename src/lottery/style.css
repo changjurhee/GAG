@@ -577,3 +577,52 @@ input[type=range]::-webkit-slider-thumb:hover {
     color: #2d3436;
     border-color: #636e72;
 }
+
+/* History Navigation */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #f1f2f6;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+}
+
+.history-section h3 {
+    margin: 0;
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.history-nav {
+    display: flex;
+    gap: 10px;
+}
+
+.nav-btn {
+    background: white;
+    border: 1px solid #dfe6e9;
+    color: #636e72;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.nav-btn:hover {
+    background: #0984e3;
+    color: white;
+    border-color: #0984e3;
+}
+
+.nav-btn:disabled,
+.nav-btn.hidden {
+    opacity: 0;
+    pointer-events: none;
+}

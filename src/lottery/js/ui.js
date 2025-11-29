@@ -260,71 +260,127 @@ function resetGame(ballContainer, startBtn, resetBtn) {
         startBtn.classList.remove('hidden');
         startBtn.disabled = false;
     }
-    if (resetBtn) resetBtn.classList.add('hidden');
-}
+    // Pagination State
+    let currentHistoryIndex = 0;
+    const PAGE_SIZE = 20;
 
-// Pagination State
-let currentHistoryIndex = 0;
-const INITIAL_BATCH_SIZE = 20;
-const LOAD_BATCH_SIZE = 50;
+    /**
+     * Initialize History Navigation
+     */
+    function initHistoryNavigation() {
+        const firstBtn = document.getElementById('history-first');
+        const prevBtn = document.getElementById('history-prev');
+        const nextBtn = document.getElementById('history-next');
+        const lastBtn = document.getElementById('history-last');
 
-/**
- * Render official winning history with pagination
- */
-function renderWinningHistory() {
-    const container = document.getElementById('winning-history-log');
-    if (!container) return;
+        if (firstBtn) {
+            firstBtn.addEventListener('click', () => {
+                if (currentHistoryIndex > 0) {
+                    currentHistoryIndex = 0;
+                    renderHistoryPage();
+                }
+            });
+        }
 
-    // 1. Show Loading State
-    container.innerHTML = '<div class="history-placeholder">Loading official history... ⏳</div>';
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => {
+                if (currentHistoryIndex > 0) {
+                    currentHistoryIndex = Math.max(0, currentHistoryIndex - PAGE_SIZE);
+                    renderHistoryPage();
+                }
+            });
+        }
 
-    if (typeof allWinningNumbers === 'undefined' || typeof allBonusNumbers === 'undefined') {
-        container.innerHTML = '<div class="history-placeholder">No official data loaded.</div>';
-        return;
+        if (nextBtn) {
+            if (typeof allWinningNumbers !== 'undefined') { // Check if data is loaded before attaching listener
+                nextBtn.addEventListener('click', () => {
+                    if (currentHistoryIndex + PAGE_SIZE < allWinningNumbers.length) {
+                        currentHistoryIndex += PAGE_SIZE;
+                        renderHistoryPage();
+                    }
+                });
+            }
+        }
+
+        if (lastBtn) {
+            if (typeof allWinningNumbers !== 'undefined') {
+                lastBtn.addEventListener('click', () => {
+                    const total = allWinningNumbers.length;
+                    if (currentHistoryIndex + PAGE_SIZE < total) {
+                        // Calculate index of the last page
+                        // Example: total 100, size 20. Last page starts at 80.
+                        // Math.floor((total - 1) / PAGE_SIZE) * PAGE_SIZE
+                        currentHistoryIndex = Math.floor((total - 1) / PAGE_SIZE) * PAGE_SIZE;
+                        renderHistoryPage();
+                    }
+                });
+            }
+        }
     }
 
-    // 3. Async Render
-    setTimeout(() => {
-        container.innerHTML = ''; // Clear loading message
-        currentHistoryIndex = 0;  // Reset index
-        renderHistoryBatch(INITIAL_BATCH_SIZE);
-    }, 50);
-}
+    /**
+     * Render official winning history (Entry Point)
+     */
+    function renderWinningHistory() {
+        const container = document.getElementById('winning-history-log');
+        if (!container) return;
 
-/**
- * Render a batch of history items
- * @param {number} batchSize - Number of items to load
- */
-function renderHistoryBatch(batchSize) {
-    const container = document.getElementById('winning-history-log');
-    if (!container) return;
+        // Initialize nav listeners if needed (idempotent)
+        // We can call this safely here or in main.js
+        initHistoryNavigation();
 
-    // Remove existing "Load More" button if any
-    const existingBtn = document.getElementById('load-more-btn');
-    if (existingBtn) existingBtn.remove();
+        // 1. Cache Check: If already populated, do nothing (Instant switch)
+        if (container.querySelector('.history-item')) {
+            return;
+        }
 
-    const totalRounds = allWinningNumbers.length;
-    const dates = typeof allWinningDates !== 'undefined' ? allWinningDates : [];
+        // 2. Show Loading State
+        container.innerHTML = '<div class="history-placeholder">Loading official history... ⏳</div>';
 
-    // Calculate end index
-    const endIndex = Math.min(currentHistoryIndex + batchSize, totalRounds);
+        if (typeof allWinningNumbers === 'undefined' || typeof allBonusNumbers === 'undefined') {
+            container.innerHTML = '<div class="history-placeholder">No official data loaded.</div>';
+            return;
+        }
 
-    // Use fragment
-    const fragment = document.createDocumentFragment();
+        // 3. Async Render
+        setTimeout(() => {
+            currentHistoryIndex = 0; // Reset to first page
+            renderHistoryPage();
+        }, 50);
+    }
 
-    for (let i = currentHistoryIndex; i < endIndex; i++) {
-        const mainNumbers = allWinningNumbers[i];
-        const bonus = allBonusNumbers[i];
-        const round = totalRounds - i;
-        const date = dates[i] || '';
+    /**
+     * Render the current page of history items
+     */
+    function renderHistoryPage() {
+        const container = document.getElementById('winning-history-log');
+        if (!container) return;
 
-        const itemDiv = document.createElement('div');
-        itemDiv.className = 'history-item';
+        const totalRounds = allWinningNumbers.length;
+        const dates = typeof allWinningDates !== 'undefined' ? allWinningDates : [];
 
-        const sortedMain = [...mainNumbers].sort((a, b) => a - b);
-        const ballsHtml = generateBallsHTML(sortedMain, bonus);
+        // Calculate end index
+        const endIndex = Math.min(currentHistoryIndex + PAGE_SIZE, totalRounds);
 
-        itemDiv.innerHTML = `
+        // Clear container (Page Navigation style)
+        container.innerHTML = '';
+
+        // Use fragment
+        const fragment = document.createDocumentFragment();
+
+        for (let i = currentHistoryIndex; i < endIndex; i++) {
+            const mainNumbers = allWinningNumbers[i];
+            const bonus = allBonusNumbers[i];
+            const round = totalRounds - i;
+            const date = dates[i] || '';
+
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'history-item';
+
+            const sortedMain = [...mainNumbers].sort((a, b) => a - b);
+            const ballsHtml = generateBallsHTML(sortedMain, bonus);
+
+            itemDiv.innerHTML = `
             <div class="history-header">
                 <span class="history-date">Round ${round} <small style="color: #aaa; margin-left: 5px;">(${date})</small></span>
                 <span class="history-info">Official Result 🏆</span>
@@ -333,36 +389,52 @@ function renderHistoryBatch(batchSize) {
                 ${ballsHtml}
             </div>
         `;
-        fragment.appendChild(itemDiv);
+            fragment.appendChild(itemDiv);
+        }
+
+        container.appendChild(fragment);
+
+        // Update Navigation Buttons Visibility
+        updateNavButtons(totalRounds);
     }
 
-    container.appendChild(fragment);
-    currentHistoryIndex = endIndex;
+    /**
+     * Update visibility of navigation buttons
+     */
+    function updateNavButtons(total) {
+        const firstBtn = document.getElementById('history-first');
+        const prevBtn = document.getElementById('history-prev');
+        const nextBtn = document.getElementById('history-next');
+        const lastBtn = document.getElementById('history-last');
 
-    // Add "Load More" button if there are more items
-    if (currentHistoryIndex < totalRounds) {
-        const remaining = totalRounds - currentHistoryIndex;
-        const nextBatch = Math.min(LOAD_BATCH_SIZE, remaining);
+        // First & Prev buttons
+        if (currentHistoryIndex <= 0) {
+            if (firstBtn) firstBtn.classList.add('hidden');
+            if (prevBtn) prevBtn.classList.add('hidden');
+        } else {
+            if (firstBtn) firstBtn.classList.remove('hidden');
+            if (prevBtn) prevBtn.classList.remove('hidden');
+        }
 
-        const btn = document.createElement('button');
-        btn.id = 'load-more-btn';
-        btn.className = 'load-more-btn';
-        btn.innerHTML = `Load More (${nextBatch} / ${remaining}) 🔽`;
-        btn.onclick = () => renderHistoryBatch(LOAD_BATCH_SIZE);
-
-        container.appendChild(btn);
+        // Next & Last buttons
+        if (currentHistoryIndex + PAGE_SIZE >= total) {
+            if (nextBtn) nextBtn.classList.add('hidden');
+            if (lastBtn) lastBtn.classList.add('hidden');
+        } else {
+            if (nextBtn) nextBtn.classList.remove('hidden');
+            if (lastBtn) lastBtn.classList.remove('hidden');
+        }
     }
-}
 
-// Make UI functions available globally
-window.initAudio = initAudio;
-window.playPopSound = playPopSound;
-window.toggleSidebar = toggleSidebar;
-window.initTabNavigation = initTabNavigation;
-window.saveHistory = saveHistory;
-window.loadHistory = loadHistory;
-window.addToHistory = addToHistory;
-window.createBall = createBall;
-window.displayNumbers = displayNumbers;
-window.resetGame = resetGame;
-window.renderWinningHistory = renderWinningHistory;
+    // Make UI functions available globally
+    window.initAudio = initAudio;
+    window.playPopSound = playPopSound;
+    window.toggleSidebar = toggleSidebar;
+    window.initTabNavigation = initTabNavigation;
+    window.saveHistory = saveHistory;
+    window.loadHistory = loadHistory;
+    window.addToHistory = addToHistory;
+    window.createBall = createBall;
+    window.displayNumbers = displayNumbers;
+    window.resetGame = resetGame;
+    window.renderWinningHistory = renderWinningHistory;
