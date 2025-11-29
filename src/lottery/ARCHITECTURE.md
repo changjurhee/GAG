@@ -89,6 +89,15 @@ C4Context
     Rel(lottery_app, blockchain_api, "Fetches Block Hash", "HTTPS/JSON")
 ```
 
+#### Context Element Descriptions
+
+| Element | Type | Description |
+| :--- | :--- | :--- |
+| **User** | Person | The end-user who interacts with the application to generate numbers or view history. |
+| **Lottery Generator** | System | The single-page web application running in the user's browser. |
+| **Blockchain.info API** | External System | A public API used to fetch the latest Bitcoin block hash, which serves as a high-entropy seed for the RNG. |
+
+
 ### 2. Module View
 High-level organization of the source code.
 
