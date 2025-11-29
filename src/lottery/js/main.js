@@ -193,7 +193,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     throw new Error("Generated numbers are invalid or insufficient.");
                 }
 
-                const mainNumbers = numbers.slice(0, CONFIG.MAIN_NUMBERS_COUNT).sort((a, b) => a - b);
+                let mainNumbers = numbers.slice(0, CONFIG.MAIN_NUMBERS_COUNT);
+
+                // Only sort if NOT sequential (Sequential mode should show prediction order)
+                if (selectedAlgo !== 'sequential') {
+                    mainNumbers.sort((a, b) => a - b);
+                }
                 const bonusNumber = numbers[CONFIG.MAIN_NUMBERS_COUNT];
 
                 console.log("Main:", mainNumbers, "Bonus:", bonusNumber);
