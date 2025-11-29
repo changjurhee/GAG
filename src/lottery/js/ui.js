@@ -270,50 +270,58 @@ function renderWinningHistory() {
     const container = document.getElementById('winning-history-log');
     if (!container) return;
 
-    // Clear existing content
-    container.innerHTML = '';
+    // 1. Cache Check: If already populated, do nothing (Instant switch)
+    if (container.querySelector('.history-item')) {
+        return;
+    }
+
+    // 2. Show Loading State
+    container.innerHTML = '<div class="history-placeholder">Loading official history... ⏳</div>';
 
     if (typeof allWinningNumbers === 'undefined' || typeof allBonusNumbers === 'undefined') {
         container.innerHTML = '<div class="history-placeholder">No official data loaded.</div>';
         return;
     }
 
-    // Use a document fragment for performance
-    const fragment = document.createDocumentFragment();
+    // 3. Async Render to allow UI to show "Loading..."
+    setTimeout(() => {
+        // Use a document fragment for performance
+        const fragment = document.createDocumentFragment();
 
-    // Iterate through all winning numbers (assuming latest first)
-    // allWinningNumbers length should match allBonusNumbers length
-    // We need to calculate round number. If data is sorted latest first, 
-    // round = total - index.
-    const totalRounds = allWinningNumbers.length;
+        // Iterate through all winning numbers (assuming latest first)
+        const totalRounds = allWinningNumbers.length;
+        // Check if dates are available
+        const dates = typeof allWinningDates !== 'undefined' ? allWinningDates : [];
 
-    allWinningNumbers.forEach((mainNumbers, index) => {
-        const round = totalRounds - index;
-        const bonus = allBonusNumbers[index];
+        allWinningNumbers.forEach((mainNumbers, index) => {
+            const round = totalRounds - index;
+            const bonus = allBonusNumbers[index];
+            const date = dates[index] || ''; // Get date if available
 
-        const itemDiv = document.createElement('div');
-        itemDiv.className = 'history-item';
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'history-item';
 
-        // Generate balls HTML
-        // Note: mainNumbers might be sorted or unsorted depending on source.
-        // We sort them for display consistency if desired, or keep as is.
-        // Let's sort them for display to look like official results.
-        const sortedMain = [...mainNumbers].sort((a, b) => a - b);
-        const ballsHtml = generateBallsHTML(sortedMain, bonus);
+            // Generate balls HTML
+            const sortedMain = [...mainNumbers].sort((a, b) => a - b);
+            const ballsHtml = generateBallsHTML(sortedMain, bonus);
 
-        itemDiv.innerHTML = `
-            <div class="history-header">
-                <span class="history-date">Round ${round}</span>
-                <span class="history-info">Official Result 🏆</span>
-            </div>
-            <div class="history-balls">
-                ${ballsHtml}
-            </div>
-        `;
-        fragment.appendChild(itemDiv);
-    });
+            itemDiv.innerHTML = `
+                <div class="history-header">
+                    <span class="history-date">Round ${round} <small style="color: #aaa; margin-left: 5px;">(${date})</small></span>
+                    <span class="history-info">Official Result 🏆</span>
+                </div>
+                <div class="history-balls">
+                    ${ballsHtml}
+                </div>
+            `;
+            fragment.appendChild(itemDiv);
+        });
 
-    container.appendChild(fragment);
+        // Clear loading message and append all items
+        container.innerHTML = '';
+        container.appendChild(fragment);
+
+    }, 50); // Short delay to render loading state
 }
 
 // Make UI functions available globally
