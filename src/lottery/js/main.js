@@ -87,17 +87,27 @@ document.addEventListener('DOMContentLoaded', () => {
     if (simTrainBtn) {
         simTrainBtn.addEventListener('click', async () => {
             if (simTrainBtn.disabled) return;
+
+            // Get Sim Count from Settings
+            const countInput = document.getElementById('sim-count-input');
+            let simCount = 2000;
+            if (countInput) {
+                simCount = parseInt(countInput.value) || 2000;
+            }
+
             simTrainBtn.disabled = true;
             const originalText = simTrainBtn.innerText;
-            simTrainBtn.innerText = "Simulating... 0%";
+            simTrainBtn.innerText = `Simulating (${simCount})... 0%`;
             progressDiv.classList.remove('hidden');
 
             // 1. Run Batch Simulation
-            const simCount = 2000;
             const simData = await batchRunSimulations(simCount, (percent) => {
-                simTrainBtn.innerText = `Simulating... ${percent}%`;
+                simTrainBtn.innerText = `Simulating (${simCount})... ${percent}%`;
                 barDiv.style.width = `${percent}%`;
             });
+
+            // Update Chart with Sim Data
+            renderChart(recentWinningNumbers, recentBonusNumbers, simData);
 
             simTrainBtn.innerText = "Training AI... 🧠";
 

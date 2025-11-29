@@ -6,8 +6,9 @@
  * Render the frequency chart
  * @param {Array} winningNumbers - Historical winning numbers
  * @param {Array} bonusNumbers - Historical bonus numbers
+ * @param {Array} simulationData - Optional simulated data for comparison
  */
-function renderChart(winningNumbers = [], bonusNumbers = []) {
+function renderChart(winningNumbers = [], bonusNumbers = [], simulationData = []) {
     const ctx = document.getElementById('frequencyChart');
     if (!ctx) return;
 
@@ -15,6 +16,7 @@ function renderChart(winningNumbers = [], bonusNumbers = []) {
     const frequency = Array(CONFIG.TOTAL_NUMBERS + 1).fill(0); // Index 0 unused
     const bonusFrequency = Array(CONFIG.TOTAL_NUMBERS + 1).fill(0);
     const firstNumFrequency = Array(CONFIG.TOTAL_NUMBERS + 1).fill(0);
+    const simFirstNumFrequency = Array(CONFIG.TOTAL_NUMBERS + 1).fill(0);
 
     winningNumbers.forEach(draw => {
         if (Array.isArray(draw) && draw.length > 0) {
@@ -26,8 +28,6 @@ function renderChart(winningNumbers = [], bonusNumbers = []) {
             });
 
             // First Number Frequency (Start Number)
-            // Use the first number as is, assuming data preserves extraction order if available
-            // If data is already sorted (like current winning_numbers.js), this will still be the smallest number.
             const firstNum = draw[0];
             if (firstNum >= 1 && firstNum <= CONFIG.TOTAL_NUMBERS) {
                 firstNumFrequency[firstNum]++;
@@ -41,11 +41,33 @@ function renderChart(winningNumbers = [], bonusNumbers = []) {
         }
     });
 
+    // Process Simulation Data
+    if (simulationData && simulationData.length > 0) {
+        simulationData.forEach(draw => {
+            if (Array.isArray(draw) && draw.length > 0) {
+                // Assuming sim data is sorted or we take the first element as "start"
+                // The headless sim returns [main..., bonus], but usually sorted main.
+                // Let's ensure we take the min of the main numbers just in case.
+                // Actually, runHeadlessSimulation returns `selected` which is pushed in order of extraction.
+                // But batchRunSimulations returns the result of runHeadlessSimulation.
+                // runHeadlessSimulation returns `selected`. 
+                // Wait, `runHeadlessSimulation` returns `selected` which is extraction order.
+                // We should sort the first 6 to find the "start number" (smallest).
+                const main = draw.slice(0, 6).sort((a, b) => a - b);
+                const first = main[0];
+                if (first >= 1 && first <= CONFIG.TOTAL_NUMBERS) {
+                    simFirstNumFrequency[first]++;
+                }
+            }
+        });
+    }
+
     // Prepare data for Chart.js
     const labels = [];
     const data = [];
     const bonusData = [];
     const firstNumData = [];
+    const simFirstNumData = [];
     const backgroundColors = [];
     const borderColors = [];
 
@@ -54,6 +76,7 @@ function renderChart(winningNumbers = [], bonusNumbers = []) {
         data.push(frequency[i]);
         bonusData.push(bonusFrequency[i]);
         firstNumData.push(firstNumFrequency[i]);
+        simFirstNumData.push(simFirstNumFrequency[i]);
 
         // Color based on range
         const range = CONFIG.RANGES.find(r => i <= r.max);
@@ -71,6 +94,12 @@ function renderChart(winningNumbers = [], bonusNumbers = []) {
         }
     }
 
+    // Destroy existing chart if it exists to prevent memory leaks/glitches
+    const existingChart = Chart.getChart(ctx);
+    if (existingChart) {
+        existingChart.destroy();
+    }
+
     new Chart(ctx, {
         data: {
             labels: labels,
@@ -82,7 +111,7 @@ function renderChart(winningNumbers = [], bonusNumbers = []) {
                     backgroundColor: backgroundColors,
                     borderColor: borderColors,
                     borderWidth: 1,
-                    order: 3,
+                    order: 4,
                     yAxisID: 'y'
                 },
                 {
@@ -93,14 +122,14 @@ function renderChart(winningNumbers = [], bonusNumbers = []) {
                     borderColor: 'rgba(45, 52, 54, 1)',
                     borderWidth: 2,
                     pointBackgroundColor: 'rgba(45, 52, 54, 1)',
-                    pointRadius: 3,
-                    tension: 0.4, // Smooth curve
-                    order: 2,
+                    pointRadius: 2,
+                    tension: 0.4,
+                    order: 3,
                     yAxisID: 'y1'
                 },
                 {
                     type: 'line',
-                    label: 'Start Number Frequency',
+                    label: 'Official Start Freq',
                     data: firstNumData,
                     backgroundColor: 'rgba(155, 89, 182, 0.2)', // Purple
                     borderColor: 'rgba(155, 89, 182, 1)',
@@ -108,8 +137,22 @@ function renderChart(winningNumbers = [], bonusNumbers = []) {
                     pointBackgroundColor: 'rgba(155, 89, 182, 1)',
                     pointRadius: 3,
                     tension: 0.4,
-                    order: 1,
+                    order: 2,
                     yAxisID: 'y1'
+                },
+                {
+                    type: 'line',
+                    label: 'Sim Start Freq (AI Data)',
+                    data: simFirstNumData,
+                    backgroundColor: 'rgba(230, 126, 34, 0.2)', // Orange
+                    borderColor: 'rgba(230, 126, 34, 1)',
+                    borderWidth: 2,
+                    borderDash: [5, 5], // Dashed line to distinguish
+                    pointBackgroundColor: 'rgba(230, 126, 34, 1)',
+                    pointRadius: 3,
+                    tension: 0.4,
+                    order: 1,
+                    yAxisID: 'y1' // Use same secondary axis
                 }
             ]
         },

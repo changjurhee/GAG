@@ -6,6 +6,8 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 - **AI Simulation Training**: Added "Simulate & Train" feature to run 2,000 headless physics simulations and feed the data into the AI model.
+- **Simulation Settings**: Added configuration for the number of training simulations in the Settings modal.
+- **Chart Visualization**: Added "Sim Start Freq" (dashed orange line) to the frequency chart to compare simulated data against official history.
 - **Architecture Documentation**: Added comprehensive `ARCHITECTURE.md` with Context, Module, Component, Class, and Sequence diagrams.
 - **QA Strategy**: Documented testing strategies and quality attributes in `ARCHITECTURE.md`.
 

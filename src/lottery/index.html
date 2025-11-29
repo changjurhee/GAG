@@ -201,6 +201,21 @@
                         <input type="file" id="excel-upload" accept=".xls" class="hidden">
                     </div>
                 </div>
+
+                <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
+
+                <div class="settings-group">
+                    <h4>Simulation Settings 🌪️</h4>
+                    <div class="control-group"
+                        style="margin-top: 10px; display: flex; align-items: center; justify-content: space-between;">
+                        <label for="sim-count-input">Training Sim Count:</label>
+                        <input type="number" id="sim-count-input" min="100" max="10000" step="100" value="2000"
+                            style="padding: 5px; width: 80px; text-align: center;">
+                    </div>
+                    <p style="font-size: 0.8rem; color: #666; margin-top: 5px;">Number of headless simulations to run
+                        for AI training.</p>
+                </div>
+
                 <div id="upload-status" class="status-msg"></div>
             </div>
         </div>
