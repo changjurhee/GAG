@@ -5,6 +5,10 @@ body {
     padding: 0;
     height: 100vh;
     overflow: hidden;
+    min-width: 1024px;
+    /* Minimum width to keep layout intact */
+    min-height: 700px;
+    /* Minimum height */
 }
 
 .dashboard {
@@ -227,7 +231,10 @@ body {
     border-radius: 16px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
     margin-bottom: 2rem;
-    height: 400px;
+    margin-bottom: 2rem;
+    height: 40vh;
+    /* Responsive height */
+    min-height: 300px;
     width: 100%;
     box-sizing: border-box;
 }
@@ -344,7 +351,8 @@ footer {
 }
 
 #history-log {
-    max-height: 300px;
+    max-height: 50vh;
+    /* Responsive max height */
     overflow-y: auto;
     display: flex;
     flex-direction: column;
@@ -450,8 +458,11 @@ footer {
 
 #simCanvas {
     width: 100%;
-    max-width: 600px;
-    height: 400px;
+    max-width: 800px;
+    /* Increased max-width */
+    height: 50vh;
+    /* Responsive height */
+    min-height: 300px;
     background: #2d3436;
     border-radius: 20px;
     box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
@@ -625,4 +636,32 @@ input[type=range]::-webkit-slider-thumb:hover {
 .nav-btn.hidden {
     opacity: 0;
     pointer-events: none;
+}
+
+/* Winning History Log Specifics */
+#winning-history-log {
+    max-height: calc(100vh - 250px);
+    /* Fill remaining vertical space */
+    overflow-y: auto;
+    padding-right: 5px;
+    /* Space for scrollbar */
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
 }
