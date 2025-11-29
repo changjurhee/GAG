@@ -134,40 +134,40 @@ graph TD
 Logical breakdown of the application's internal components.
 
 ```mermaid
-componentDiagram
-    package "Presentation Layer" {
-        [UI Manager]
-        [Simulation Engine]
-        [Chart Renderer]
-    }
+graph TD
+    subgraph Presentation ["Presentation Layer"]
+        UI[UI Manager]
+        Sim[Simulation Engine]
+        Chart[Chart Renderer]
+    end
 
-    package "Logic Layer" {
-        [Main Controller]
-        [Algorithm Engine]
-        [RNG Service]
-    }
+    subgraph Logic ["Logic Layer"]
+        Main[Main Controller]
+        Algo[Algorithm Engine]
+        RNG[RNG Service]
+    end
 
-    package "Data Layer" {
-        [Settings Manager]
-        [History Manager]
-        [Official Data Store]
-    }
+    subgraph Data ["Data Layer"]
+        Settings[Settings Manager]
+        History[History Manager]
+        Store[Official Data Store]
+    end
 
-    package "AI Layer" {
-        [TensorFlow Model]
-    }
+    subgraph AI ["AI Layer"]
+        TF[TensorFlow Model]
+    end
 
-    [Main Controller] --> [UI Manager]
-    [Main Controller] --> [Algorithm Engine]
-    [Main Controller] --> [Settings Manager]
-    [Main Controller] --> [History Manager]
+    Main --> UI
+    Main --> Algo
+    Main --> Settings
+    Main --> History
     
-    [Algorithm Engine] --> [RNG Service]
-    [Algorithm Engine] --> [Official Data Store]
-    [Algorithm Engine] --> [TensorFlow Model]
+    Algo --> RNG
+    Algo --> Store
+    Algo --> TF
 
-    [UI Manager] --> [Simulation Engine]
-    [UI Manager] --> [Chart Renderer]
+    UI --> Sim
+    UI --> Chart
 ```
 
 ### 4. Class Diagram
