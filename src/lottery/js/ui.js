@@ -260,127 +260,129 @@ function resetGame(ballContainer, startBtn, resetBtn) {
         startBtn.classList.remove('hidden');
         startBtn.disabled = false;
     }
-    // Pagination State
-    let currentHistoryIndex = 0;
-    const PAGE_SIZE = 20;
+}
 
-    /**
-     * Initialize History Navigation
-     */
-    function initHistoryNavigation() {
-        const firstBtn = document.getElementById('history-first');
-        const prevBtn = document.getElementById('history-prev');
-        const nextBtn = document.getElementById('history-next');
-        const lastBtn = document.getElementById('history-last');
+// Pagination State
+let currentHistoryIndex = 0;
+const PAGE_SIZE = 20;
 
-        if (firstBtn) {
-            firstBtn.addEventListener('click', () => {
-                if (currentHistoryIndex > 0) {
-                    currentHistoryIndex = 0;
+/**
+ * Initialize History Navigation
+ */
+function initHistoryNavigation() {
+    const firstBtn = document.getElementById('history-first');
+    const prevBtn = document.getElementById('history-prev');
+    const nextBtn = document.getElementById('history-next');
+    const lastBtn = document.getElementById('history-last');
+
+    if (firstBtn) {
+        firstBtn.addEventListener('click', () => {
+            if (currentHistoryIndex > 0) {
+                currentHistoryIndex = 0;
+                renderHistoryPage();
+            }
+        });
+    }
+
+    if (prevBtn) {
+        prevBtn.addEventListener('click', () => {
+            if (currentHistoryIndex > 0) {
+                currentHistoryIndex = Math.max(0, currentHistoryIndex - PAGE_SIZE);
+                renderHistoryPage();
+            }
+        });
+    }
+
+    if (nextBtn) {
+        if (typeof allWinningNumbers !== 'undefined') { // Check if data is loaded before attaching listener
+            nextBtn.addEventListener('click', () => {
+                if (currentHistoryIndex + PAGE_SIZE < allWinningNumbers.length) {
+                    currentHistoryIndex += PAGE_SIZE;
                     renderHistoryPage();
                 }
             });
         }
+    }
 
-        if (prevBtn) {
-            prevBtn.addEventListener('click', () => {
-                if (currentHistoryIndex > 0) {
-                    currentHistoryIndex = Math.max(0, currentHistoryIndex - PAGE_SIZE);
+    if (lastBtn) {
+        if (typeof allWinningNumbers !== 'undefined') {
+            lastBtn.addEventListener('click', () => {
+                const total = allWinningNumbers.length;
+                if (currentHistoryIndex + PAGE_SIZE < total) {
+                    // Calculate index of the last page
+                    // Example: total 100, size 20. Last page starts at 80.
+                    // Math.floor((total - 1) / PAGE_SIZE) * PAGE_SIZE
+                    currentHistoryIndex = Math.floor((total - 1) / PAGE_SIZE) * PAGE_SIZE;
                     renderHistoryPage();
                 }
             });
         }
+    }
+}
 
-        if (nextBtn) {
-            if (typeof allWinningNumbers !== 'undefined') { // Check if data is loaded before attaching listener
-                nextBtn.addEventListener('click', () => {
-                    if (currentHistoryIndex + PAGE_SIZE < allWinningNumbers.length) {
-                        currentHistoryIndex += PAGE_SIZE;
-                        renderHistoryPage();
-                    }
-                });
-            }
-        }
+/**
+ * Render official winning history (Entry Point)
+ */
+function renderWinningHistory() {
+    const container = document.getElementById('winning-history-log');
+    if (!container) return;
 
-        if (lastBtn) {
-            if (typeof allWinningNumbers !== 'undefined') {
-                lastBtn.addEventListener('click', () => {
-                    const total = allWinningNumbers.length;
-                    if (currentHistoryIndex + PAGE_SIZE < total) {
-                        // Calculate index of the last page
-                        // Example: total 100, size 20. Last page starts at 80.
-                        // Math.floor((total - 1) / PAGE_SIZE) * PAGE_SIZE
-                        currentHistoryIndex = Math.floor((total - 1) / PAGE_SIZE) * PAGE_SIZE;
-                        renderHistoryPage();
-                    }
-                });
-            }
-        }
+    // Initialize nav listeners if needed (idempotent)
+    // We can call this safely here or in main.js
+    initHistoryNavigation();
+
+    // 1. Cache Check: If already populated, do nothing (Instant switch)
+    if (container.querySelector('.history-item')) {
+        return;
     }
 
-    /**
-     * Render official winning history (Entry Point)
-     */
-    function renderWinningHistory() {
-        const container = document.getElementById('winning-history-log');
-        if (!container) return;
+    // 2. Show Loading State
+    container.innerHTML = '<div class="history-placeholder">Loading official history... ⏳</div>';
 
-        // Initialize nav listeners if needed (idempotent)
-        // We can call this safely here or in main.js
-        initHistoryNavigation();
-
-        // 1. Cache Check: If already populated, do nothing (Instant switch)
-        if (container.querySelector('.history-item')) {
-            return;
-        }
-
-        // 2. Show Loading State
-        container.innerHTML = '<div class="history-placeholder">Loading official history... ⏳</div>';
-
-        if (typeof allWinningNumbers === 'undefined' || typeof allBonusNumbers === 'undefined') {
-            container.innerHTML = '<div class="history-placeholder">No official data loaded.</div>';
-            return;
-        }
-
-        // 3. Async Render
-        setTimeout(() => {
-            currentHistoryIndex = 0; // Reset to first page
-            renderHistoryPage();
-        }, 50);
+    if (typeof allWinningNumbers === 'undefined' || typeof allBonusNumbers === 'undefined') {
+        container.innerHTML = '<div class="history-placeholder">No official data loaded.</div>';
+        return;
     }
 
-    /**
-     * Render the current page of history items
-     */
-    function renderHistoryPage() {
-        const container = document.getElementById('winning-history-log');
-        if (!container) return;
+    // 3. Async Render
+    setTimeout(() => {
+        currentHistoryIndex = 0; // Reset to first page
+        renderHistoryPage();
+    }, 50);
+}
 
-        const totalRounds = allWinningNumbers.length;
-        const dates = typeof allWinningDates !== 'undefined' ? allWinningDates : [];
+/**
+ * Render the current page of history items
+ */
+function renderHistoryPage() {
+    const container = document.getElementById('winning-history-log');
+    if (!container) return;
 
-        // Calculate end index
-        const endIndex = Math.min(currentHistoryIndex + PAGE_SIZE, totalRounds);
+    const totalRounds = allWinningNumbers.length;
+    const dates = typeof allWinningDates !== 'undefined' ? allWinningDates : [];
 
-        // Clear container (Page Navigation style)
-        container.innerHTML = '';
+    // Calculate end index
+    const endIndex = Math.min(currentHistoryIndex + PAGE_SIZE, totalRounds);
 
-        // Use fragment
-        const fragment = document.createDocumentFragment();
+    // Clear container (Page Navigation style)
+    container.innerHTML = '';
 
-        for (let i = currentHistoryIndex; i < endIndex; i++) {
-            const mainNumbers = allWinningNumbers[i];
-            const bonus = allBonusNumbers[i];
-            const round = totalRounds - i;
-            const date = dates[i] || '';
+    // Use fragment
+    const fragment = document.createDocumentFragment();
 
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'history-item';
+    for (let i = currentHistoryIndex; i < endIndex; i++) {
+        const mainNumbers = allWinningNumbers[i];
+        const bonus = allBonusNumbers[i];
+        const round = totalRounds - i;
+        const date = dates[i] || '';
 
-            const sortedMain = [...mainNumbers].sort((a, b) => a - b);
-            const ballsHtml = generateBallsHTML(sortedMain, bonus);
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'history-item';
 
-            itemDiv.innerHTML = `
+        const sortedMain = [...mainNumbers].sort((a, b) => a - b);
+        const ballsHtml = generateBallsHTML(sortedMain, bonus);
+
+        itemDiv.innerHTML = `
             <div class="history-header">
                 <span class="history-date">Round ${round} <small style="color: #aaa; margin-left: 5px;">(${date})</small></span>
                 <span class="history-info">Official Result 🏆</span>
@@ -389,52 +391,52 @@ function resetGame(ballContainer, startBtn, resetBtn) {
                 ${ballsHtml}
             </div>
         `;
-            fragment.appendChild(itemDiv);
-        }
-
-        container.appendChild(fragment);
-
-        // Update Navigation Buttons Visibility
-        updateNavButtons(totalRounds);
+        fragment.appendChild(itemDiv);
     }
 
-    /**
-     * Update visibility of navigation buttons
-     */
-    function updateNavButtons(total) {
-        const firstBtn = document.getElementById('history-first');
-        const prevBtn = document.getElementById('history-prev');
-        const nextBtn = document.getElementById('history-next');
-        const lastBtn = document.getElementById('history-last');
+    container.appendChild(fragment);
 
-        // First & Prev buttons
-        if (currentHistoryIndex <= 0) {
-            if (firstBtn) firstBtn.classList.add('hidden');
-            if (prevBtn) prevBtn.classList.add('hidden');
-        } else {
-            if (firstBtn) firstBtn.classList.remove('hidden');
-            if (prevBtn) prevBtn.classList.remove('hidden');
-        }
+    // Update Navigation Buttons Visibility
+    updateNavButtons(totalRounds);
+}
 
-        // Next & Last buttons
-        if (currentHistoryIndex + PAGE_SIZE >= total) {
-            if (nextBtn) nextBtn.classList.add('hidden');
-            if (lastBtn) lastBtn.classList.add('hidden');
-        } else {
-            if (nextBtn) nextBtn.classList.remove('hidden');
-            if (lastBtn) lastBtn.classList.remove('hidden');
-        }
+/**
+ * Update visibility of navigation buttons
+ */
+function updateNavButtons(total) {
+    const firstBtn = document.getElementById('history-first');
+    const prevBtn = document.getElementById('history-prev');
+    const nextBtn = document.getElementById('history-next');
+    const lastBtn = document.getElementById('history-last');
+
+    // First & Prev buttons
+    if (currentHistoryIndex <= 0) {
+        if (firstBtn) firstBtn.classList.add('hidden');
+        if (prevBtn) prevBtn.classList.add('hidden');
+    } else {
+        if (firstBtn) firstBtn.classList.remove('hidden');
+        if (prevBtn) prevBtn.classList.remove('hidden');
     }
 
-    // Make UI functions available globally
-    window.initAudio = initAudio;
-    window.playPopSound = playPopSound;
-    window.toggleSidebar = toggleSidebar;
-    window.initTabNavigation = initTabNavigation;
-    window.saveHistory = saveHistory;
-    window.loadHistory = loadHistory;
-    window.addToHistory = addToHistory;
-    window.createBall = createBall;
-    window.displayNumbers = displayNumbers;
-    window.resetGame = resetGame;
-    window.renderWinningHistory = renderWinningHistory;
+    // Next & Last buttons
+    if (currentHistoryIndex + PAGE_SIZE >= total) {
+        if (nextBtn) nextBtn.classList.add('hidden');
+        if (lastBtn) lastBtn.classList.add('hidden');
+    } else {
+        if (nextBtn) nextBtn.classList.remove('hidden');
+        if (lastBtn) lastBtn.classList.remove('hidden');
+    }
+}
+
+// Make UI functions available globally
+window.initAudio = initAudio;
+window.playPopSound = playPopSound;
+window.toggleSidebar = toggleSidebar;
+window.initTabNavigation = initTabNavigation;
+window.saveHistory = saveHistory;
+window.loadHistory = loadHistory;
+window.addToHistory = addToHistory;
+window.createBall = createBall;
+window.displayNumbers = displayNumbers;
+window.resetGame = resetGame;
+window.renderWinningHistory = renderWinningHistory;
