@@ -235,7 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Re-enable UI after animation starts (or estimate end)
                 // For simplicity, we re-enable immediately after scheduling timeouts, 
                 // but ideally we wait for the last one.
-                const delay = (CONFIG.MAIN_NUMBERS_COUNT + 1) * CONFIG.DISPLAY_INTERVAL + 500;
+                const uiResetDelay = (CONFIG.MAIN_NUMBERS_COUNT + 1) * CONFIG.DISPLAY_INTERVAL + 500;
                 setTimeout(() => {
                     if (resetBtn) resetBtn.classList.remove('hidden');
                     if (startBtn) {
@@ -244,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         startBtn.classList.remove('hidden');
                         startBtn.classList.remove('disabled-look');
                     }
-                }, delay);
+                }, uiResetDelay);
 
             } catch (displayError) {
                 console.error("Display error:", displayError);
@@ -259,3 +259,4 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }, 50); // Short delay to ensure repaint
     }
+});
