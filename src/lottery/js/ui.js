@@ -212,6 +212,19 @@ function addToHistory(numbers, algoName, rngName) {
 }
 
 /**
+ * Get CSS class for ball color based on number range
+ * @param {number} number
+ * @returns {string} CSS class name
+ */
+function getBallRangeClass(number) {
+    if (number <= 10) return 'range-1-10';
+    if (number <= 20) return 'range-11-20';
+    if (number <= 30) return 'range-21-30';
+    if (number <= 40) return 'range-31-40';
+    return 'range-41-45';
+}
+
+/**
  * Helper to create a ball DOM element
  * @param {number} number
  * @param {boolean} isBonus
