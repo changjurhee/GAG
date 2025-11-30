@@ -265,6 +265,16 @@ function createBall(number, container) {
 }
 
 /**
+ * Helper to create a plus sign element
+ */
+function createPlusSign() {
+    const plus = document.createElement('div');
+    plus.classList.add('plus-sign');
+    plus.textContent = '+';
+    return plus;
+}
+
+/**
  * Display numbers with animation
  * @param {number[]} numbers - Array of 7 numbers
  * @param {HTMLElement} container - The ball container element
@@ -533,5 +543,6 @@ window.setButtonState = setButtonState;
 window.createBallElement = createBallElement;
 window.getBallRangeClass = getBallRangeClass;
 window.generateBallsHTML = generateBallsHTML;
+window.createPlusSign = createPlusSign;
 
 
