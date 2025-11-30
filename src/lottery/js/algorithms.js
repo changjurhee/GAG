@@ -143,9 +143,16 @@ async function getSequentialNumbers(rng) {
         history.forEach(draw => {
             if (!Array.isArray(draw) || draw.length < 6) return;
 
-            // Use raw draw order (assuming it represents extraction order)
-            // If data is pre-sorted, this learns the sorted pattern.
-            const sequence = draw;
+            // Use a copy of the draw to avoid modifying original data
+            // Shuffle the sequence to avoid learning "sorted" patterns from official history
+            // This converts the Markov Chain into a "Co-occurrence" learner
+            const sequence = [...draw];
+
+            // Fisher-Yates Shuffle
+            for (let i = sequence.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [sequence[i], sequence[j]] = [sequence[j], sequence[i]];
+            }
 
             // Record transitions (State -> Next State)
             for (let i = 0; i < sequence.length - 1; i++) {
