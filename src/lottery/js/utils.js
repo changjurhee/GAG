@@ -66,15 +66,46 @@ function createPlusSign(small = false) {
  */
 function generateBallsHTML(mainNumbers, bonusNumber) {
     let ballsHtml = '';
-    
+
     mainNumbers.forEach(num => {
         ballsHtml += `<div class="ball ${getBallRangeClass(num)}">${num}</div>`;
     });
-    
+
     ballsHtml += `<div class="plus-sign-small">+</div>`;
     ballsHtml += `<div class="ball ${getBallRangeClass(bonusNumber)} bonus-ball-small">${bonusNumber}</div>`;
-    
+
     return ballsHtml;
+}
+
+/**
+ * Get display name for algorithm
+ * @param {string} algo - Algorithm code
+ * @returns {string} Display name
+ */
+function getAlgoName(algo) {
+    switch (algo) {
+        case 'weighted': return 'Frequency (Weighted)';
+        case 'adaptive': return 'Trend (Adaptive)';
+        case 'non-frequency': return 'Non-Frequency (Cold)';
+        case 'sequential': return 'Sequential (AI/RL)';
+        case 'random':
+        default: return 'Pure Random';
+    }
+}
+
+/**
+ * Get display name for RNG
+ * @param {string} rng - RNG code
+ * @returns {string} Display name
+ */
+function getRngName(rng) {
+    switch (rng) {
+        case 'secure': return 'Secure (Web Crypto)';
+        case 'vrf': return 'VRF (Simulated)';
+        case 'blockchain': return 'Blockchain (Bitcoin)';
+        case 'prng':
+        default: return 'Basic PRNG (Fast)';
+    }
 }
 
 // Make utility functions available globally
@@ -83,3 +114,5 @@ window.getBallColor = getBallColor;
 window.createBallElement = createBallElement;
 window.createPlusSign = createPlusSign;
 window.generateBallsHTML = generateBallsHTML;
+window.getAlgoName = getAlgoName;
+window.getRngName = getRngName;
