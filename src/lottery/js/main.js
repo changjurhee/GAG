@@ -206,7 +206,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log("Main:", mainNumbers, "Bonus:", bonusNumber);
 
                 // 4. Display
-                const shouldSort = selectedAlgo !== 'sequential';
+                // User requested NO sorting for the main display animation (extraction order)
+                const shouldSort = false;
                 displayNumbers(numbers, ballContainer, shouldSort);
                 addToHistory(numbers, getAlgoName(selectedAlgo), getRngName(selectedRngType));
 
