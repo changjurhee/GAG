@@ -480,6 +480,43 @@ function updateNavButtons(total) {
     }
 }
 
+/**
+ * Set the state of a button (loading, disabled, etc.)
+ * @param {HTMLElement} btn - The button element
+ * @param {string} state - 'loading', 'disabled', 'normal', 'success'
+ * @param {string} text - Optional text to set
+ */
+function setButtonState(btn, state, text = '') {
+    if (!btn) return;
+
+    switch (state) {
+        case 'loading':
+            btn.disabled = true;
+            if (text) btn.innerText = text;
+            btn.classList.add('disabled-look');
+            break;
+        case 'disabled':
+            btn.disabled = true;
+            if (text) btn.innerText = text;
+            break;
+        case 'success':
+            btn.disabled = false;
+            if (text) btn.innerText = text;
+            btn.style.background = "#55efc4";
+            btn.style.color = "#2d3436";
+            break;
+        case 'normal':
+        default:
+            btn.disabled = false;
+            if (text) btn.innerText = text;
+            btn.classList.remove('disabled-look');
+            btn.classList.remove('hidden');
+            btn.style.background = "";
+            btn.style.color = "";
+            break;
+    }
+}
+
 // Make UI functions available globally
 window.initAudio = initAudio;
 window.playPopSound = playPopSound;
@@ -492,3 +529,9 @@ window.createBall = createBall;
 window.displayNumbers = displayNumbers;
 window.resetGame = resetGame;
 window.renderWinningHistory = renderWinningHistory;
+window.setButtonState = setButtonState;
+window.createBallElement = createBallElement;
+window.getBallRangeClass = getBallRangeClass;
+window.generateBallsHTML = generateBallsHTML;
+
+

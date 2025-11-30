@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v1.5.1] - 2025-12-01
+
+### Added
+- **Root Cause Analysis**: Detailed report on recent display bugs (`ROOT_CAUSE_ANALYSIS.md`).
+- **UI Centralization**: New `setButtonState` helper in `ui.js` to manage button states consistently.
+
+### Changed
+- **Refactoring**: Consolidated all UI logic into `ui.js` and cleaned up `main.js`.
+- **Fix**: Resolved persistent "missing function" errors by ensuring all helpers (`createBallElement`, `getBallRangeClass`, `generateBallsHTML`) are properly exported.
+- **Fix**: Removed duplicate display logic that caused balls to appear twice.
+
+### Fixed
+- **Simulation Settings**: Added input for "Training Sim Count" (up to 10M) in the Settings modal.
+
 ## [v1.5.0] - 2025-11-30
 
 ### Added

@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (trainBtn) {
         trainBtn.addEventListener('click', async () => {
-            trainBtn.disabled = true;
+            setButtonState(trainBtn, 'loading');
             progressDiv.classList.remove('hidden');
 
             await trainAIModel((epoch, loss) => {
@@ -71,14 +71,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 barDiv.style.width = `${(epoch / 20) * 100}%`;
             });
 
-            trainBtn.innerText = "Model Trained ✅";
-            trainBtn.style.background = "#55efc4";
-            trainBtn.style.color = "#2d3436";
+            setButtonState(trainBtn, 'success', "Model Trained ✅");
             setTimeout(() => {
-                trainBtn.disabled = false;
-                trainBtn.innerText = "Retrain Model 🧠";
-                trainBtn.style.background = "white";
-                trainBtn.style.color = "#d63031";
+                setButtonState(trainBtn, 'normal', "Retrain Model 🧠");
+                trainBtn.style.color = "#d63031"; // Keep specific style if needed, or move to CSS
             }, 3000);
         });
     }
@@ -105,11 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Get Sim Count from Settings
             let simCount = parseInt(countInput.value) || 2000;
 
-            simTrainBtn.disabled = true;
-            // Store the dynamic text as original
-            const originalText = simTrainBtn.innerText;
-
-            simTrainBtn.innerText = `Simulating (${simCount})... 0%`;
+            setButtonState(simTrainBtn, 'loading', `Simulating (${simCount})... 0%`);
             progressDiv.classList.remove('hidden');
 
             // 1. Run Batch Simulation
@@ -130,10 +122,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 barDiv.style.width = `${(epoch / 20) * 100}%`;
             }, simData);
 
-            simTrainBtn.innerText = "Done! ✅";
+            setButtonState(simTrainBtn, 'success', "Done! ✅");
             setTimeout(() => {
-                simTrainBtn.disabled = false;
-                // Restore the dynamic text (re-read input in case it changed, though unlikely during disabled)
+                setButtonState(simTrainBtn, 'normal');
                 updateButtonText();
             }, 3000);
         });
@@ -152,11 +143,9 @@ document.addEventListener('DOMContentLoaded', () => {
         initAudio();
 
         // 1. Immediate UI Feedback
-        const originalBtnText = startBtn ? startBtn.innerText : 'Generate';
+        const originalBtnText = startBtn ? 'Generate Numbers' : 'Generate'; // Default text
         if (startBtn) {
-            startBtn.disabled = true;
-            startBtn.innerText = "Generating... ⏳";
-            startBtn.classList.add('disabled-look'); // Optional styling
+            setButtonState(startBtn, 'loading', "Generating... ⏳");
         }
         if (resetBtn) resetBtn.classList.add('hidden');
         if (ballContainer) ballContainer.innerHTML = '';
@@ -222,16 +211,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 addToHistory(numbers, getAlgoName(selectedAlgo), getRngName(selectedRngType));
 
                 // Re-enable UI after animation starts (or estimate end)
-                // For simplicity, we re-enable immediately after scheduling timeouts, 
+                // For simplicity, we re-enable immediately after scheduling timeouts,
                 // but ideally we wait for the last one.
                 const uiResetDelay = (CONFIG.MAIN_NUMBERS_COUNT + 1) * CONFIG.DISPLAY_INTERVAL + 500;
                 setTimeout(() => {
                     if (resetBtn) resetBtn.classList.remove('hidden');
                     if (startBtn) {
-                        startBtn.disabled = false;
-                        startBtn.innerText = originalBtnText;
-                        startBtn.classList.remove('hidden');
-                        startBtn.classList.remove('disabled-look');
+                        setButtonState(startBtn, 'normal', originalBtnText);
                     }
                 }, uiResetDelay);
 
@@ -241,9 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Ensure UI is reset even on error
                 if (startBtn) {
-                    startBtn.disabled = false;
-                    startBtn.innerText = originalBtnText;
-                    startBtn.classList.remove('disabled-look');
+                    setButtonState(startBtn, 'normal', originalBtnText);
                 }
             }
         }, 50); // Short delay to ensure repaint
