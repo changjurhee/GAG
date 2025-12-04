@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v1.6.0] - 2025-12-04
+
+### Changed
+- **Cleanup**: Deleted legacy `script.js` file.
+- **Refactoring**: Removed duplicated UI helper functions from `js/ui.js` and standardized on `js/utils.js`.
+- **Versioning**: Synced `package.json` version with `CHANGELOG.md`.
+
 ## [v1.5.1] - 2025-12-01
 
 ### Added

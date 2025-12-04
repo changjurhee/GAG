@@ -211,47 +211,11 @@ function addToHistory(numbers, algoName, rngName) {
     saveHistory();
 }
 
-/**
- * Generate HTML for balls
- * @param {number[]} mainNumbers
- * @param {number} bonusNumber
- */
-function generateBallsHTML(mainNumbers, bonusNumber) {
-    let html = '';
-    mainNumbers.forEach(num => {
-        html += `<div class="ball ${getBallRangeClass(num)}">${num}</div>`;
-    });
-    html += `<div class="plus-sign">+</div>`;
-    html += `<div class="ball bonus ${getBallRangeClass(bonusNumber)}">${bonusNumber}</div>`;
-    return html;
-}
+// Removed generateBallsHTML (using utils.js)
 
-/**
- * Get CSS class for ball color based on number range
- * @param {number} number
- * @returns {string} CSS class name
- */
-function getBallRangeClass(number) {
-    if (number <= 10) return 'range-1';
-    if (number <= 20) return 'range-2';
-    if (number <= 30) return 'range-3';
-    if (number <= 40) return 'range-4';
-    return 'range-5';
-}
+// Removed getBallRangeClass (using utils.js)
 
-/**
- * Helper to create a ball DOM element
- * @param {number} number
- * @param {boolean} isBonus
- */
-function createBallElement(number, isBonus = false) {
-    const ball = document.createElement('div');
-    ball.classList.add('ball');
-    ball.classList.add(getBallRangeClass(number));
-    if (isBonus) ball.classList.add('bonus');
-    ball.textContent = number;
-    return ball;
-}
+// Removed createBallElement (using utils.js)
 
 /**
  * Create a ball and add it to the container
@@ -264,15 +228,7 @@ function createBall(number, container) {
     container.appendChild(ball);
 }
 
-/**
- * Helper to create a plus sign element
- */
-function createPlusSign() {
-    const plus = document.createElement('div');
-    plus.classList.add('plus-sign');
-    plus.textContent = '+';
-    return plus;
-}
+// Removed createPlusSign (using utils.js)
 
 /**
  * Display numbers with animation
@@ -540,9 +496,9 @@ window.displayNumbers = displayNumbers;
 window.resetGame = resetGame;
 window.renderWinningHistory = renderWinningHistory;
 window.setButtonState = setButtonState;
-window.createBallElement = createBallElement;
-window.getBallRangeClass = getBallRangeClass;
-window.generateBallsHTML = generateBallsHTML;
-window.createPlusSign = createPlusSign;
+// window.createBallElement = createBallElement; // Removed
+// window.getBallRangeClass = getBallRangeClass; // Removed
+// window.generateBallsHTML = generateBallsHTML; // Removed
+// window.createPlusSign = createPlusSign; // Removed
 
 
