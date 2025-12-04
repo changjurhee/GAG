@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased] - 2025-12-04
+
+### Fixed
+- crawl_numbers.py
+  - 파일 경로를 스크립트 위치 기준으로 안전하게 처리하도록 변경하여 실행 위치에 의존하지 않게 함.
+  - API 호출 시 세션 기반 재시도/백오프 로직 추가로 네트워크 일시 오류에 견고해짐.
+  - 비-200 응답 또는 예외 발생 시 current_round 값을 증가시켜 동일 라운드에 무한히 머무르는 문제 해결.
+  - 기존 JS 파싱을 더 견고하게 처리(sanitize)하여 JSON 변환 실패 가능성 감소.
+  - 기존 데이터에 날짜 정보(allWinningDates)가 없는 경우 기존 당첨번호는 보존하고 날짜는 None으로 채워 데이터 손실 방지.
+
+### Changed
+- crawl_numbers.py 리팩토링: 함수 분리 및 로그 메시지 정비로 가독성/유지보수성 향상.
+
+### Notes
+- package.json version bumped to 1.7.0.
+
 ## [v1.6.0] - 2025-12-04
 
 ### Changed
