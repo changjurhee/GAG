@@ -6,8 +6,8 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# Package lock file (optional - you may want to track this)
-# package-lock.json
+# Package lock files
+package-lock.json
 
 # OS files
 .DS_Store
