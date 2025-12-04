@@ -24,4 +24,36 @@ describe('Lottery Algorithms', () => {
         const unique = new Set(numbers);
         expect(unique.size).toBe(7);
     });
+
+    test('getAdaptiveNumbers returns correct count of numbers', async () => {
+        const numbers = await getAdaptiveNumbers(mockRng, []);
+        expect(numbers).toHaveLength(7); // 6 main + 1 bonus
+
+        // Check ranges
+        numbers.forEach(num => {
+            expect(num).toBeGreaterThanOrEqual(1);
+            expect(num).toBeLessThanOrEqual(45);
+        });
+    });
+
+    test('getAdaptiveNumbers returns unique numbers', async () => {
+        const numbers = await getAdaptiveNumbers(mockRng, []);
+        const unique = new Set(numbers);
+        expect(unique.size).toBe(7);
+    });
+
+    test('getAdaptiveNumbers works with historical data', async () => {
+        const mockHistory = [
+            [1, 2, 3, 4, 5, 6],
+            [7, 8, 9, 10, 11, 12],
+            [13, 14, 15, 16, 17, 18]
+        ];
+        const numbers = await getAdaptiveNumbers(mockRng, mockHistory);
+        expect(numbers).toHaveLength(7);
+        
+        numbers.forEach(num => {
+            expect(num).toBeGreaterThanOrEqual(1);
+            expect(num).toBeLessThanOrEqual(45);
+        });
+    });
 });

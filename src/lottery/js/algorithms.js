@@ -63,13 +63,24 @@ async function getWeightedNumbers(rng, winningNumbers = []) {
  * @param {Array} winningNumbers - Historical winning numbers
  * @returns {Promise<number[]>} Array of selected numbers
  */
+// Cache for adaptive weights to avoid recalculating on every click
+let cachedAdaptiveWeights = null;
+let cachedAdaptiveHistoryLength = 0;
+
 async function getAdaptiveNumbers(rng, winningNumbers = []) {
+    // Use cached weights if data hasn't changed
+    if (cachedAdaptiveWeights && cachedAdaptiveHistoryLength === winningNumbers.length) {
+        return createPoolAndPick(cachedAdaptiveWeights, CONFIG.ADAPTIVE_POWER, rng);
+    }
+
     const weights = {};
     for (let i = 1; i <= CONFIG.TOTAL_NUMBERS; i++) {
         weights[i] = 1.0;
     }
 
-    const history = [...winningNumbers];
+    // Use only recent 100 draws for trend analysis (sufficient for trends + better performance)
+    const RECENT_LIMIT = 100;
+    const history = winningNumbers.slice(0, RECENT_LIMIT);
 
     for (let i = history.length - 1; i >= 0; i--) {
         const draw = history[i];
@@ -85,6 +96,10 @@ async function getAdaptiveNumbers(rng, winningNumbers = []) {
             }
         });
     }
+
+    // Cache the calculated weights
+    cachedAdaptiveWeights = weights;
+    cachedAdaptiveHistoryLength = winningNumbers.length;
 
     return createPoolAndPick(weights, CONFIG.ADAPTIVE_POWER, rng);
 }
